@@ -7,6 +7,7 @@
 #include <libgen.h>
 #include <sys/time.h>
 #include <string.h>
+#include <signal.h>
 
 SerialComm serial;
 
