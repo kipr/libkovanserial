@@ -56,7 +56,8 @@ int main(int argc, char *argv[])
 		if(!proto.next(p, 1000)) continue;
 		if(p.type == Command::FileHeader) {
 			long start = msystime();
-			Command::FileHeaderData header = *reinterpret_cast<Command::FileHeaderData *>(p.data);
+			Command::FileHeaderData header;
+			memcpy(&header, p.data, sizeof(Command::FileHeaderData));
 			std::ofstream file(header.dest, std::ios::binary);
 			if(!file.is_open()) {
 				std::cout << "Couldn't write " << header.dest << std::endl;

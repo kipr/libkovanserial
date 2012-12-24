@@ -95,8 +95,8 @@ bool TransportLayer::recv(Packet &p, const uint32_t &timeout)
 		if(!m_comm->read(ckp, timeout)) return false;
 		ack.resend = !ckp.isValid();
 		std::cout << "Valid? " << ckp.isValid() << std::endl;
-		p = ckp.packet;
 		if(!m_comm->write(ack)) return false;
+		p = ckp.packet;
 		std::cout << "Wrote ack with resend = " << ack.resend << std::endl;
 	} while(ack.resend);
 	

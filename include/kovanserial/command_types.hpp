@@ -16,7 +16,7 @@ namespace Command
 	struct FileHeaderData
 	{
 		uint32_t size;
-		char dest[4096];
+		char dest[500];
 	};
 }
 
