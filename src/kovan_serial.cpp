@@ -26,7 +26,7 @@ bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
 		sizeof(Command::FileHeaderData)))) return false;
 	
 	Packet confirm;
-	if(!m_transport->recv(confirm, 5000) || confirm.type != Command::FileConfirm) {
+	if(!m_transport->recv(confirm, 15000) || confirm.type != Command::FileConfirm) {
 		std::cout << "Didn't receive confirm. Aborting.";
 		return false;
 	}
