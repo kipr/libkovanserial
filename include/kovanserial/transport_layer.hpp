@@ -31,6 +31,7 @@ struct Ack
 	Ack();
 	Ack(const bool &resend);
 	
+	bool error : 1;
 	bool resend : 1;
 };
 

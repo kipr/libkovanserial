@@ -9,8 +9,8 @@ namespace Command
 	{
 		None = 0,
 		FileHeader,
-		File,
-		FileResult
+		FileConfirm,
+		File
 	};
 	
 	struct FileHeaderData

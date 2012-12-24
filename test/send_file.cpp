@@ -61,10 +61,13 @@ int main(int argc, char *argv[])
 			Command::FileHeaderData header;
 			memcpy(&header, p.data, sizeof(Command::FileHeaderData));
 			std::ofstream file(header.dest, std::ios::binary);
+			proto.confirmFile(file.is_open());
+			
 			if(!file.is_open()) {
 				std::cout << "Couldn't write " << header.dest << std::endl;
 				continue;
 			}
+			
 			if(!proto.recvFile(header.size, &file, 1000)) {
 				std::cout << "recvFile failed" << std::endl;
 				continue;

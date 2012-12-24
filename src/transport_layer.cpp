@@ -68,7 +68,7 @@ bool TransportLayer::send(const Packet &p)
 	
 	Ack ack;
 	uint8_t tries = 0;
-	for(; tries < 10; ++tries) {
+	for(; tries < 5; ++tries) {
 		if(!m_comm->read(ack, 1000)) {
 			std::cout << "Reading ack failed" << std::endl;
 			continue;

@@ -24,6 +24,13 @@ bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
 	if(!m_transport->send(Packet(Command::FileHeader, 0,
 		reinterpret_cast<uint8_t *>(&header),
 		sizeof(Command::FileHeaderData)))) return false;
+	
+	Packet confirm;
+	if(!m_transport->recv(confirm, 5000) || confirm.type != Command::FileConfirm) {
+		std::cout << "Didn't receive confirm. Aborting.";
+		return false;
+	}
+	
 	uint32_t order = 0;
 	uint8_t buffer[TRANSPORT_MAX_DATA_SIZE];
 	while(!in->eof() && !in->fail()) {
@@ -38,6 +45,12 @@ bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
 	std::cout << "Finished writing entire file" << std::endl;
 	
 	return true;
+}
+
+bool KovanSerial::confirmFile(const bool &good)
+{
+	return m_transport->send(Packet(Command::FileConfirm, 0,
+		reinterpret_cast<const uint8_t *>(&good), sizeof(bool)));
 }
 
 bool KovanSerial::recvFile(const size_t &size, std::ostream *out, const uint32_t &timeout)

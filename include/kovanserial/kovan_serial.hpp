@@ -14,6 +14,7 @@ public:
 	~KovanSerial();
 	
 	bool sendFile(const std::string &dest, std::istream *in);
+	bool confirmFile(const bool &good);
 	bool recvFile(const size_t &size, std::ostream *out, const uint32_t &timeout = 0);
 	
 	bool next(Packet &p, const uint32_t &timeout = 0);
