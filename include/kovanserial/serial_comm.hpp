@@ -35,7 +35,10 @@ public:
 			}
 			
 			ssize_t ret = read(reinterpret_cast<uint8_t *>(&t + pos), sizeof(T) - pos);
-			if(ret < 0 && errno != EAGAIN) return false;
+			if(ret < 0 && errno != EAGAIN) {
+				std::cout << "Got error " << errno << " at pos " << pos << " capturing size " << sizeof(T) << std::endl;
+				return false;
+			}
 			if(ret > 0) {
 				pos += ret;
 				std::cout << "Got " << pos << " of " << sizeof(T) << std::endl;
