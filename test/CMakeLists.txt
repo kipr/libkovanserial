@@ -1,0 +1,2 @@
+add_executable(send_file send_file.cpp)
+target_link_libraries(send_file kovanserial)
