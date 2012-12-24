@@ -7,7 +7,7 @@ include_directories(include)
 file(GLOB INCLUDES include/kovanserial/*.hpp include/kovanserial/*.h)
 file(GLOB SOURCES src/transport_layer.cpp src/kovan_serial.cpp src/serial_comm.cpp src/crc.c)
 
-add_definitions(-g)
+add_definitions(-g -pg)
 
 if(UNIX)
 	set(SOURCES ${SOURCES} src/serial_comm_unix.cpp)

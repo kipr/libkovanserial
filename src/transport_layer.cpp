@@ -72,7 +72,7 @@ bool TransportLayer::send(const Packet &p)
 	for(; tries < 10; ++tries) {
 		if(!m_comm->read(ack, 1000)) {
 			std::cout << "Reading ack failed" << std::endl;
-			return false;
+			continue;
 		}
 		std::cout << "ack is " << (!ack.resend ? "good" : "bad") << std::endl;
 		if(!ack.resend) break;

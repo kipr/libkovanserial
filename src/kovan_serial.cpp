@@ -17,7 +17,7 @@ KovanSerial::~KovanSerial()
 bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
 {
 	Command::FileHeaderData header;
-	strncpy(header.dest, dest.c_str(), 4096);
+	strncpy(header.dest, dest.c_str(), 500);
 	in->seekg(0, std::ios::end);
 	header.size = in->tellg();
 	in->seekg(0, std::ios::beg);
@@ -29,7 +29,10 @@ bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
 	while(!in->eof() && !in->fail()) {
 		in->read(reinterpret_cast<char *>(buffer), TRANSPORT_MAX_DATA_SIZE);
 		if(!m_transport->send(Packet(Command::File, ++order,
-			buffer, TRANSPORT_MAX_DATA_SIZE))) return false;
+			buffer, TRANSPORT_MAX_DATA_SIZE))) {
+			std::cout << "sending file packet failed" << std::endl;
+			return false;
+		}
 	}
 	
 	std::cout << "Finished writing entire file" << std::endl;
@@ -43,7 +46,10 @@ bool KovanSerial::recvFile(const size_t &size, std::ostream *out, const uint32_t
 	
 	Packet p;
 	while(i < size) {
-		if(!m_transport->recv(p, timeout)) return false;
+		if(!m_transport->recv(p, timeout)) {
+			std::cout << "recvFile timed out" << std::endl;
+			return false;
+		}
 		if(p.type != Command::File) {
 			std::cerr << "Non-file type in file stream." << std::endl;
 			return false;

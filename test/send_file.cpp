@@ -44,7 +44,9 @@ int main(int argc, char *argv[])
 			std::cout << "Couldn't open " << argv[2] << std::endl;
 			return EXIT_FAILURE;
 		}
-		if(!proto.sendFile(std::string(argv[3]) + "/" + basename(argv[2]), &file)) {
+		char path[500];
+		sprintf(path, "%s/%s", argv[3], argv[2]);
+		if(!proto.sendFile(path, &file)) {
 			std::cout << "Send failed" << std::endl;
 		}
 		file.close();
