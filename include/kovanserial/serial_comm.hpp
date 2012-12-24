@@ -26,7 +26,7 @@ public:
 	bool read(T &t, const uint32_t &timeout = 0)
 	{
 		size_t pos = 0;
-		long start = msystime();
+		long startTime = msystime();
 		do {
 			long endTime = msystime();
 			if(timeout > 0 && endTime - startTime > timeout) {
