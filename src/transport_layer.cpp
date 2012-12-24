@@ -15,7 +15,7 @@ Packet::Packet(const uint16_t &type, const uint32_t &order, const uint8_t *data,
 	order(order)
 {
 	if(!data) return;
-	memcpy(this->data, data, std::min(len, TRANSPORT_MAX_DATA_SIZE));
+	// memcpy(this->data, data, std::min(len, TRANSPORT_MAX_DATA_SIZE));
 }
 
 ChecksummedPacket::ChecksummedPacket()
