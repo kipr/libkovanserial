@@ -26,14 +26,13 @@ public:
 	bool read(T &t, const uint32_t &timeout = 0)
 	{
 		size_t pos = 0;
-		timeval start;
-		gettimeofday(&start, NULL);
-		long startTime = start.tv_sec * 1000L + start.tv_usec / 1000L;
+		long start = msystime();
 		do {
-			timeval end;
-			gettimeofday(&end, NULL);
-			long endTime = end.tv_sec * 1000L + end.tv_usec / 1000L;
-			if(timeout > 0 && endTime - startTime > timeout) return false;
+			long endTime = msystime();
+			if(timeout > 0 && endTime - startTime > timeout) {
+				std::cout << "timeout with " << (endTime - startTime) << std::endl;
+				return false;
+			}
 			
 			ssize_t ret = read(reinterpret_cast<uint8_t *>(&t + pos), sizeof(T) - pos);
 			if(ret < 0 && errno != EAGAIN) return false;
@@ -53,6 +52,8 @@ public:
 private:
 	SerialComm(const SerialComm &rhs);
 	void configure();
+	
+	static long msystime();
 	
 	int m_fd;
 };

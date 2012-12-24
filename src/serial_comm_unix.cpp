@@ -74,3 +74,10 @@ void SerialComm::configure()
 	cfsetospeed(&t, 115200);
 	tcsetattr(m_fd, TCSANOW, &t);
 }
+
+long SerialComm::msystime()
+{
+	timeval t;
+	gettimeofday(&t, NULL);
+	return t.tv_sec * 1000L + t.tv_usec / 1000L;
+}
