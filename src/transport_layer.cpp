@@ -74,13 +74,14 @@ bool TransportLayer::send(const Packet &p)
 			std::cout << "Reading ack failed" << std::endl;
 			continue;
 		}
-		std::cout << "ack is " << (!ack.resend ? "good" : "bad") << std::endl;
+		
 		if(!ack.resend) break;
 		if(!m_comm->write(ckp)) {
 			std::cout << "Resend failed" << std::endl;
 			return false;
 		}
-		std::cout << "writing data again" << std::endl;
+		
+		std::cout << "resend..." << std::endl;
 	}
 	
 	return tries < 10;
@@ -91,10 +92,8 @@ bool TransportLayer::recv(Packet &p, const uint32_t &timeout)
 	ChecksummedPacket ckp;
 	Ack ack;
 	do {
-		std::cout << "Waiting for packet" << std::endl;
 		if(!m_comm->read(ckp, timeout)) return false;
 		ack.resend = !ckp.isValid();
-		std::cout << "Valid? " << ckp.isValid() << std::endl;
 		if(!m_comm->write(ack)) {
 			std::cout << "Writing ack failed" << std::endl;
 			return false;

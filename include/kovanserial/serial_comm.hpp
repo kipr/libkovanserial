@@ -41,7 +41,6 @@ public:
 			}
 			if(ret > 0) {
 				pos += ret;
-				std::cout << "Got " << pos << " of " << sizeof(T) << std::endl;
 				startTime = endTime;
 			}
 		} while(pos < sizeof(T));

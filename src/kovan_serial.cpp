@@ -37,7 +37,7 @@ bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
 	
 	std::cout << "Finished writing entire file" << std::endl;
 	
-	return !in->fail();
+	return true;
 }
 
 bool KovanSerial::recvFile(const size_t &size, std::ostream *out, const uint32_t &timeout)
@@ -50,11 +50,12 @@ bool KovanSerial::recvFile(const size_t &size, std::ostream *out, const uint32_t
 			std::cout << "recvFile timed out" << std::endl;
 			return false;
 		}
+		
 		if(p.type != Command::File) {
 			std::cerr << "Non-file type in file stream." << std::endl;
 			return false;
 		}
-		std::cout << "Got chunk " << (i / TRANSPORT_MAX_DATA_SIZE) << " of "<< (size / TRANSPORT_MAX_DATA_SIZE) << std::endl;
+		
 		out->write(reinterpret_cast<const char *>(p.data),
 			std::min(TRANSPORT_MAX_DATA_SIZE, size - i));
 		i += TRANSPORT_MAX_DATA_SIZE;
