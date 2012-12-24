@@ -3,6 +3,8 @@
 #include "kovanserial/serial_comm.hpp"
 #include <iostream>
 
+#include <string.h>
+
 Packet::Packet()
 	: type(0),
 	order(0)

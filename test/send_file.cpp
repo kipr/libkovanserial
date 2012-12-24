@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <libgen.h>
 #include <sys/time.h>
+#include <string.h>
 
 SerialComm serial;
 

@@ -1,6 +1,8 @@
 #include "kovanserial/kovan_serial.hpp"
 #include "kovanserial/transport_layer.hpp"
 
+#include <string.h>
+
 KovanSerial::KovanSerial(TransportLayer *transport)
 	: m_transport(transport)
 {
