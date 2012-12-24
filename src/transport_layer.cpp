@@ -65,7 +65,6 @@ bool TransportLayer::send(const Packet &p)
 		std::cerr << "TransportLayer::send failed to write packet." << std::endl;
 		return false;
 	}
-	std::cout << "Wrote checksummed packet for the first time." << std::endl;
 	
 	Ack ack;
 	uint8_t tries = 0;
@@ -99,7 +98,9 @@ bool TransportLayer::recv(Packet &p, const uint32_t &timeout)
 			return false;
 		}
 		p = ckp.packet;
-		std::cout << "Wrote ack with resend = " << ack.resend << std::endl;
+		if(ack.resend) {
+			std::cout << "Wrote ack with resend = " << ack.resend << std::endl;
+		}
 	} while(ack.resend);
 	
 	return true;
