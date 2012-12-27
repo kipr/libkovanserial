@@ -5,6 +5,7 @@
 #include <sys/unistd.h>
 #include <sys/fcntl.h>
 #include <errno.h>
+#include <stdio.h>
 
 #define AD_PORT 12345
 #define AD_GROUP "225.0.0.37"
