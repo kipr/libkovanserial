@@ -6,6 +6,7 @@
 #include "crc.h"
 
 #include <algorithm>
+#include <string.h>
 
 struct Packet
 {
