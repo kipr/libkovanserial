@@ -31,12 +31,12 @@ Advert::Advert(const char *serial, const char *version,
 UdpAdvertiser::UdpAdvertiser()
 	: m_fd(-1)
 {
-	setupSocket();
-
 	memset(&m_group, 0, sizeof(m_group));
 	m_group.sin_family = AF_INET;
 	m_group.sin_addr.s_addr = inet_addr(AD_GROUP);
 	m_group.sin_port = htons(AD_PORT);
+	
+	setupSocket();
 }
 
 UdpAdvertiser::~UdpAdvertiser()
@@ -81,6 +81,16 @@ void UdpAdvertiser::setupSocket()
 	
 	if(fcntl(m_fd, F_SETFL, O_NONBLOCK) < 0) {
 		perror("fnctl");
+		close(m_fd);
+		m_fd = -1;
+		return;
+	}
+	
+	sockaddr_in groupBind = m_group;
+	groupBind.sin_addr.s_addr = htonl(INADDR_ANY);
+	
+	if (bind(m_fd, (sockaddr *) &groupBind, sizeof(groupBind)) < 0) {
+		perror("bind");
 		close(m_fd);
 		m_fd = -1;
 		return;
