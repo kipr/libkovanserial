@@ -1,21 +1,19 @@
-#include "kovanserial/serial_comm.hpp"
+#include "kovanserial/usb_serial_unix.hpp"
 
+#include <termios.h>
+#include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <termios.h>
 
-SerialComm::SerialComm()
-	: m_fd(-1)
+UsbSerialUnix::UsbSerialUnix()
 {
-	
 }
 
-SerialComm::~SerialComm()
+UsbSerialUnix::~UsbSerialUnix()
 {
-	close();
 }
 
-bool SerialComm::open(const char *dev)
+bool UsbSerialUnix::open(const char *dev)
 {
 	if(m_fd >= 0) close();
 	m_fd = ::open(dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
@@ -26,33 +24,29 @@ bool SerialComm::open(const char *dev)
 	return true;
 }
 
-void SerialComm::close()
+void UsbSerialUnix::close()
 {
 	if(m_fd < 0) return;
 	::close(m_fd);
 	m_fd = -1;
 }
 
-bool SerialComm::isOpen() const
+bool UsbSerialUnix::available() const
 {
 	return m_fd >= 0;
 }
 
-ssize_t SerialComm::write(const uint8_t *data, const size_t &len)
+ssize_t UsbSerialUnix::write(const uint8_t *data, const size_t &len)
 {
 	return ::write(m_fd, data, len);
 }
 
-ssize_t SerialComm::read(uint8_t *data, const size_t &len)
+ssize_t UsbSerialUnix::read(uint8_t *data, const size_t &len)
 {
 	return ::read(m_fd, data, len);
 }
 
-SerialComm::SerialComm(const SerialComm &rhs)
-{
-}
-
-void SerialComm::configure()
+void UsbSerialUnix::configure()
 {
 	if(m_fd < 0) return;
 	struct ::termios t;
@@ -73,11 +67,4 @@ void SerialComm::configure()
 	cfsetispeed(&t, 115200);
 	cfsetospeed(&t, 115200);
 	tcsetattr(m_fd, TCSANOW, &t);
-}
-
-long SerialComm::msystime()
-{
-	timeval t;
-	gettimeofday(&t, NULL);
-	return t.tv_sec * 1000L + t.tv_usec / 1000L;
 }

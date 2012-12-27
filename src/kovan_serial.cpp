@@ -14,6 +14,65 @@ KovanSerial::~KovanSerial()
 	
 }
 
+bool KovanSerial::sendProperty(const std::string &name, const std::string &value)
+{
+	Command::PropertyValuePairData data;
+	strncpy(data.name, name.c_str(), 8);
+	strncpy(data.value, value.c_str(), 128);
+	if(!m_transport->send(Packet(Command::Property, data))) {
+		std::cout << "Failed to send property" << std::endl;
+		return false;
+	}
+	return true;
+}
+
+bool KovanSerial::property(const std::string &name, std::string &value)
+{
+	Command::PropertyData data;
+	strncpy(data.name, name.c_str(), 8);
+	if(!m_transport->send(Packet(Command::Property, data))) {
+		std::cout << "Failed to send property request" << std::endl;
+		return false;
+	}
+	
+	Packet p;
+	if(!m_transport->recv(p, 1000) || p.type != Command::Property) {
+		std::cout << "Did not receive property value pair" << std::endl;
+		return false;
+	}
+	
+	Command::PropertyValuePairData ret;
+	p.as(ret);
+	ret.value[127] = 0; // Make sure we're null termed
+	value = ret.value;
+	return true;
+}
+
+bool KovanSerial::sendPropertyList(const std::list<std::string> &names)
+{
+	Command::PropertyListData data;
+	data.size = names.size();
+	
+	std::list<std::string>::const_iterator it = names.begin();
+	size_t i = 0;
+	for(; it != names.end() && i < 50; ++it, ++i) {
+		Command::PropertyData entry;
+		strncpy(entry.name, (*it).c_str(), 8);
+		data.names[i] = entry;
+	}
+	
+	if(!m_transport->send(Packet(Command::Property, data))) {
+		std::cout << "Failed to send property" << std::endl;
+		return false;
+	}
+	return true;
+}
+
+bool KovanSerial::listProperties(std::list<std::string> &names)
+{
+	return false;
+}
+
 bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
 {
 	Command::FileHeaderData header;
@@ -21,7 +80,7 @@ bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
 	in->seekg(0, std::ios::end);
 	header.size = in->tellg();
 	in->seekg(0, std::ios::beg);
-	if(!m_transport->send(Packet(Command::FileHeader, 0,
+	if(!m_transport->send(Packet(Command::FileHeader,
 		reinterpret_cast<uint8_t *>(&header),
 		sizeof(Command::FileHeaderData)))) return false;
 	
@@ -31,11 +90,17 @@ bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
 		return false;
 	}
 	
-	uint32_t order = 0;
+	bool good = false;
+	confirm.as(good);
+	if(!good) {
+		std::cout << "Other side rejected our transfer." << std::endl;
+		return false;
+	}
+	
 	uint8_t buffer[TRANSPORT_MAX_DATA_SIZE];
 	while(!in->eof() && !in->fail()) {
 		in->read(reinterpret_cast<char *>(buffer), TRANSPORT_MAX_DATA_SIZE);
-		if(!m_transport->send(Packet(Command::File, ++order,
+		if(!m_transport->send(Packet(Command::File,
 			buffer, TRANSPORT_MAX_DATA_SIZE))) {
 			std::cout << "sending file packet failed" << std::endl;
 			return false;
@@ -49,7 +114,7 @@ bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
 
 bool KovanSerial::confirmFile(const bool &good)
 {
-	return m_transport->send(Packet(Command::FileConfirm, 0,
+	return m_transport->send(Packet(Command::FileConfirm,
 		reinterpret_cast<const uint8_t *>(&good), sizeof(bool)));
 }
 
@@ -80,4 +145,9 @@ bool KovanSerial::recvFile(const size_t &size, std::ostream *out, const uint32_t
 bool KovanSerial::next(Packet &p, const uint32_t &timeout)
 {
 	return m_transport->recv(p, timeout);
+}
+
+void KovanSerial::hangup()
+{
+	m_transport->send(Packet(Command::Hangup, 0, 0));
 }

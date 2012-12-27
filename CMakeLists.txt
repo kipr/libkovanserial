@@ -5,12 +5,21 @@ cmake_minimum_required(VERSION 2.6)
 include_directories(include)
 
 file(GLOB INCLUDES include/kovanserial/*.hpp include/kovanserial/*.h)
-file(GLOB SOURCES src/transport_layer.cpp src/kovan_serial.cpp src/serial_comm.cpp src/crc.c)
+file(GLOB SOURCES
+	src/transport_layer.cpp
+	src/kovan_serial.cpp
+	src/general.cpp
+	src/tcp.cpp
+	src/tcp_server.cpp
+	src/kovan_server.cpp
+	src/udp_advertiser.cpp
+	src/tcp_serial.cpp
+	src/crc.c)
 
 add_definitions(-g -pg)
 
 if(UNIX)
-	set(SOURCES ${SOURCES} src/serial_comm_unix.cpp)
+	set(SOURCES ${SOURCES} src/usb_serial_unix.cpp)
 elseif(WIN32)
 	message(FATAL_ERROR "Windows not supported")
 endif(UNIX)

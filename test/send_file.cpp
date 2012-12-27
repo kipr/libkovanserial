@@ -1,6 +1,6 @@
 #include <kovanserial/kovan_serial.hpp>
 #include <kovanserial/transport_layer.hpp>
-#include <kovanserial/serial_comm.hpp>
+#include <kovanserial/usb_serial_unix.hpp>
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -8,15 +8,6 @@
 #include <sys/time.h>
 #include <string.h>
 #include <signal.h>
-
-SerialComm serial;
-
-void sig_handler(int signo)
-{
-	if(signo != SIGINT) return;
-	serial.close();
-	exit(EXIT_SUCCESS);
-}
 
 long msystime()
 {
@@ -32,10 +23,12 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 	
-	signal(SIGINT, sig_handler);
-	serial.open(argv[1]);
-	
-	TransportLayer transport(&serial);
+	UsbSerialUnix usb;
+	if(!usb.open(argv[1])) {
+		std::cout << "Failed to open serial port" << std::endl;
+		return EXIT_FAILURE;
+	}
+	TransportLayer transport(&usb);
 	KovanSerial proto(&transport);
 	
 	if(argc == 4) {
@@ -80,6 +73,6 @@ int main(int argc, char *argv[])
 		std::cout << "type = " << p.type << std::endl;
 	}
 	
-	serial.close();
+	usb.close();
 	return EXIT_SUCCESS;
 }

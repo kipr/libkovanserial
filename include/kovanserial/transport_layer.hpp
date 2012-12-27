@@ -5,49 +5,45 @@
 
 #include "crc.h"
 
+#include <algorithm>
+
 struct Packet
 {
 	Packet();
-	Packet(const uint16_t &type, const uint32_t &order, const uint8_t *data, const size_t &len);
+	Packet(const uint16_t &type, const uint8_t *data, const size_t &len);
+	
+	template<typename T>
+	Packet(const uint16_t &type, const T &data)
+		: type(type)
+	{
+		memcpy(this->data, &data, std::min(sizeof(T), TRANSPORT_MAX_DATA_SIZE));
+	}
+	
+	template<typename T>
+	void as(T &t) const
+	{
+		memcpy(reinterpret_cast<uint8_t *>(&t), data,
+			std::min(sizeof(T), TRANSPORT_MAX_DATA_SIZE));
+	}
 	
 	uint16_t type;
-	uint32_t order;
 	uint8_t data[TRANSPORT_MAX_DATA_SIZE];
 };
 
-struct ChecksummedPacket
-{
-	ChecksummedPacket();
-	ChecksummedPacket(const Packet &packet);
-	
-	bool isValid() const;
-	
-	Packet packet;
-	crc_t checksum;
-};
-
-struct Ack
-{
-	Ack();
-	Ack(const bool &resend);
-	
-	bool error : 1;
-	bool resend : 1;
-};
-
-class SerialComm;
+class Transmitter;
 
 class TransportLayer
 {
 public:
-	TransportLayer(SerialComm *comm);
+	TransportLayer(Transmitter *transmitter);
 	~TransportLayer();
 	
 	virtual bool send(const Packet &p);
 	virtual bool recv(Packet &p, const uint32_t &timeout = 0);
 	
 private:
-	SerialComm *m_comm;
+	Transmitter *m_transmitter;
+	uint64_t m_order;
 };
 
 #endif
