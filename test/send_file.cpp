@@ -23,11 +23,12 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 	
-	UsbSerialUnix usb;
-	if(!usb.open(argv[1])) {
+	UsbSerialUnix usb(argv[1]);
+	if(!usb.makeAvailable()) {
 		std::cout << "Failed to open serial port" << std::endl;
 		return EXIT_FAILURE;
 	}
+	
 	TransportLayer transport(&usb);
 	KovanSerial proto(&transport);
 	

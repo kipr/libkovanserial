@@ -9,6 +9,9 @@ namespace Command
 	{
 		None = 0,
 		Hangup,
+		FileAction,
+		FileActionConfirm,
+		FileActionProgress,
 		ListProperties,
 		Property,
 		FileHeader,
@@ -37,6 +40,18 @@ namespace Command
 	{
 		uint32_t size;
 		char dest[500];
+	};
+	
+	struct FileActionData
+	{
+		char action[8];
+		char dest[500];
+	};
+	
+	struct FileActionProgressData
+	{
+		bool finished;
+		double progress;
 	};
 }
 

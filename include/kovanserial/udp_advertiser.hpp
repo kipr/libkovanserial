@@ -33,6 +33,7 @@ public:
 	bool pulse(const Advert &ad);
 	std::list<IncomingAdvert> sample(const unsigned long &milli);
 	
+	void reset();
 private:
 	void setupSocket();
 	

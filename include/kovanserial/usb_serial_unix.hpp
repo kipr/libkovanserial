@@ -6,10 +6,10 @@
 class UsbSerialUnix : public Transmitter
 {
 public:
-	UsbSerialUnix();
+	UsbSerialUnix(const char *dev);
 	~UsbSerialUnix();
 	
-	virtual bool open(const char *dev);
+	virtual bool makeAvailable();
 	virtual void close();
 	virtual bool available() const;
 	
@@ -20,6 +20,7 @@ private:
 	void configure();
 	
 	int m_fd;
+	char m_dev[128];
 };
 
 #endif

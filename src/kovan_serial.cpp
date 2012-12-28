@@ -142,6 +142,64 @@ bool KovanSerial::recvFile(const size_t &size, std::ostream *out, const uint32_t
 	return true;
 }
 
+bool KovanSerial::sendFileAction(const std::string &action, const std::string &file)
+{
+	Command::FileActionData data;
+	strncpy(data.action, action.c_str(), 8);
+	strncpy(data.dest, file.c_str(), 500);
+	
+	if(!m_transport->send(Packet(Command::FileAction, data))) {
+		std::cout << "Failed to send file action" << std::endl;
+		return false;
+	}
+	
+	Packet confirm;
+	if(!m_transport->recv(confirm, 15000) || confirm.type != Command::FileActionConfirm) {
+		std::cout << "Didn't receive confirm. Aborting." << std::endl;
+		return false;
+	}
+	
+	bool good = false;
+	confirm.as(good);
+	if(!good) {
+		std::cout << "Other side rejected our action." << std::endl;
+		return false;
+	}
+	
+	return true;
+}
+
+bool KovanSerial::confirmFileAction(const bool &good)
+{
+	return m_transport->send(Packet(Command::FileActionConfirm,
+		reinterpret_cast<const uint8_t *>(&good), sizeof(bool)));
+}
+
+bool KovanSerial::sendFileActionProgress(const bool &finished, const double &progress)
+{
+	Command::FileActionProgressData data;
+	data.finished = finished;
+	data.progress = progress;
+	return m_transport->send(Packet(Command::FileActionProgress, data));
+}
+
+bool KovanSerial::recvFileActionProgress(bool &finished, double &progress, const uint32_t &timeout)
+{
+	Packet p;
+	if(!m_transport->recv(p, timeout) || p.type != Command::FileActionProgress) {
+		std::cout << "Couldn't recv file action progress" << std::endl;
+		return false;
+	}
+	
+	Command::FileActionProgressData data;
+	p.as(data);
+	
+	finished = data.finished;
+	progress = data.progress;
+	
+	return true;
+}
+
 bool KovanSerial::next(Packet &p, const uint32_t &timeout)
 {
 	return m_transport->recv(p, timeout);

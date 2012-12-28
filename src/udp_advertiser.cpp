@@ -68,8 +68,15 @@ std::list<IncomingAdvert> UdpAdvertiser::sample(const unsigned long &milli)
 	return ret;
 }
 
+void UdpAdvertiser::reset()
+{
+	setupSocket();
+}
+
 void UdpAdvertiser::setupSocket()
 {
+	if(m_fd >= 0) ::close(m_fd);
+	
 	m_fd = socket(AF_INET, SOCK_DGRAM, 0);
 	if(m_fd < 0) {
 		perror("socket");

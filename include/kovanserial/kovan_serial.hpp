@@ -26,6 +26,12 @@ public:
 	bool confirmFile(const bool &good);
 	bool recvFile(const size_t &size, std::ostream *out, const uint32_t &timeout = 0);
 	
+	bool sendFileAction(const std::string &action, const std::string &file);
+	bool confirmFileAction(const bool &good);
+	
+	bool sendFileActionProgress(const bool &finished, const double &progress);
+	bool recvFileActionProgress(bool &finished, double &progress, const uint32_t &timeout = 0);
+	
 	bool next(Packet &p, const uint32_t &timeout = 0);
 	
 	void hangup();

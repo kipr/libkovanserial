@@ -5,18 +5,19 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-UsbSerialUnix::UsbSerialUnix()
+UsbSerialUnix::UsbSerialUnix(const char *dev)
 {
+	strncpy(m_dev, dev, 128);
 }
 
 UsbSerialUnix::~UsbSerialUnix()
 {
 }
 
-bool UsbSerialUnix::open(const char *dev)
+bool UsbSerialUnix::makeAvailable()
 {
 	if(m_fd >= 0) close();
-	m_fd = ::open(dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
+	m_fd = ::open(m_dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
 	const bool success = m_fd >= 0;
 	if(!success) return false;
 	tcflush(m_fd, TCIOFLUSH);

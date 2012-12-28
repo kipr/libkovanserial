@@ -3,28 +3,19 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <netinet/in.h>
 #include <unistd.h>
 #include <string.h>
 
-TcpSerial::TcpSerial()
+TcpSerial::TcpSerial(const sockaddr_in &addr)
+	: m_addr(addr)
 {
 	setFd(socket(PF_INET, SOCK_STREAM, 0));
 }
 
-bool TcpSerial::connect(const char *host, const char *service)
+bool TcpSerial::makeAvailable()
 {
-	addrinfo hints;
-	addrinfo *res;
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-
-	getaddrinfo(host, service, &hints, &res);
-	bool ret = ::connect(fd(), res->ai_addr, res->ai_addrlen) == 0;
-	freeaddrinfo(res);
-	return ret;
+	disconnect();
+	return ::connect(fd(), (sockaddr *)&m_addr, sizeof(m_addr)) == 0;
 }
 
 void TcpSerial::disconnect()

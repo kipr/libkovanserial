@@ -13,6 +13,8 @@ public:
 	bool listen(const int &backLog);
 	bool accept();
 	
+	virtual bool makeAvailable();
+	
 private:
 	int m_ourFd;
 };

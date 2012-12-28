@@ -47,3 +47,8 @@ bool TcpServer::accept()
 	setFd(fd);
 	return true;
 }
+
+bool TcpServer::makeAvailable()
+{
+	return true;
+}
