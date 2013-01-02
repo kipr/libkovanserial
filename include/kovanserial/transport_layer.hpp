@@ -36,8 +36,19 @@ class Transmitter;
 class TransportLayer
 {
 public:
+	enum AuthMode {
+		AuthClient,
+		AuthServer
+	};
+	
 	TransportLayer(Transmitter *transmitter);
-	~TransportLayer();
+	virtual ~TransportLayer();
+	
+	void setAuthMode(TransportLayer::AuthMode authMode);
+	TransportLayer::AuthMode authMode() const;
+	
+	void setPassword(const uint8_t *password);
+	const uint8_t *password() const;
 	
 	virtual bool send(const Packet &p);
 	virtual bool recv(Packet &p, const uint32_t &timeout = 0);
@@ -45,6 +56,9 @@ public:
 private:
 	Transmitter *m_transmitter;
 	uint64_t m_order;
+	
+	AuthMode m_authMode;
+	uint8_t m_password[16];
 };
 
 #endif

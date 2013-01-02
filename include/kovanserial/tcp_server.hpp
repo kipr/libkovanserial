@@ -11,9 +11,11 @@ public:
 	
 	bool bind(const char *port);
 	bool listen(const int &backLog);
-	bool accept();
+	bool accept(uint64_t timeout);
 	
 	virtual bool makeAvailable();
+	virtual void endSession();
+	virtual bool isReliable() const;
 	
 private:
 	int m_ourFd;

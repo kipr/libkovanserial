@@ -3,17 +3,20 @@
 
 #include "tcp.hpp"
 
-#include <netinet/in.h>
+#include <sys/socket.h>
 
 class TcpSerial : public Tcp
 {
 public:
-	TcpSerial(const sockaddr_in &addr);
+	TcpSerial(const char *host, const char *service);
 	
 	virtual bool makeAvailable();
-	void disconnect();
+	virtual void endSession();
+	virtual bool isReliable() const;
+
 private:
-	sockaddr_in m_addr;
+	char m_host[128];
+	char m_service[128];
 };
 
 #endif

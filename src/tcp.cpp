@@ -1,9 +1,18 @@
 #include "kovanserial/tcp.hpp"
 
 #include <unistd.h>
+
+#include "socket_utils.hpp"
+
+#ifdef WIN32
+#include <winsock2.h>
+#include <windows.h>
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <netdb.h>
-#include <arpa/inet.h>
 #include <netinet/in.h>
+#endif
 
 Tcp::Tcp()
 	: m_fd(-1)
@@ -34,8 +43,7 @@ ssize_t Tcp::read(uint8_t *data, const size_t &len)
 
 void Tcp::closeFd()
 {
-	::close(m_fd);
-	m_fd = -1;
+	closeSocket(m_fd);
 }
 
 void Tcp::setFd(const int &fd)

@@ -4,25 +4,41 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdio.h>
 
 UsbSerialUnix::UsbSerialUnix(const char *dev)
+	: m_fd(-1)
 {
 	strncpy(m_dev, dev, 128);
 }
 
 UsbSerialUnix::~UsbSerialUnix()
 {
+	close();
 }
 
 bool UsbSerialUnix::makeAvailable()
 {
-	if(m_fd >= 0) close();
+	if(m_fd >= 0) return true;
 	m_fd = ::open(m_dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
 	const bool success = m_fd >= 0;
-	if(!success) return false;
+	if(!success) {
+		perror("open");
+		return false;
+	}
 	tcflush(m_fd, TCIOFLUSH);
 	configure();
 	return true;
+}
+
+void UsbSerialUnix::endSession()
+{
+	close();
+}
+
+bool UsbSerialUnix::isReliable() const
+{
+	return false;
 }
 
 void UsbSerialUnix::close()

@@ -14,6 +14,11 @@ KovanSerial::~KovanSerial()
 	
 }
 
+bool KovanSerial::hasAuthentication()
+{
+	
+}
+
 bool KovanSerial::sendProperty(const std::string &name, const std::string &value)
 {
 	Command::PropertyValuePairData data;
@@ -73,16 +78,16 @@ bool KovanSerial::listProperties(std::list<std::string> &names)
 	return false;
 }
 
-bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
+bool KovanSerial::sendFile(const std::string &dest, const std::string &metadata, std::istream *in)
 {
 	Command::FileHeaderData header;
-	strncpy(header.dest, dest.c_str(), 500);
+	strncpy(header.dest, dest.c_str(), 256);
+	strncpy(header.metadata, metadata.c_str(), 200);
 	in->seekg(0, std::ios::end);
 	header.size = in->tellg();
 	in->seekg(0, std::ios::beg);
-	if(!m_transport->send(Packet(Command::FileHeader,
-		reinterpret_cast<uint8_t *>(&header),
-		sizeof(Command::FileHeaderData)))) return false;
+	
+	if(!m_transport->send(Packet(Command::FileHeader, header))) return false;
 	
 	Packet confirm;
 	if(!m_transport->recv(confirm, 15000) || confirm.type != Command::FileConfirm) {
@@ -114,8 +119,7 @@ bool KovanSerial::sendFile(const std::string &dest, std::istream *in)
 
 bool KovanSerial::confirmFile(const bool &good)
 {
-	return m_transport->send(Packet(Command::FileConfirm,
-		reinterpret_cast<const uint8_t *>(&good), sizeof(bool)));
+	return m_transport->send(Packet(Command::FileConfirm, good));
 }
 
 bool KovanSerial::recvFile(const size_t &size, std::ostream *out, const uint32_t &timeout)
@@ -154,7 +158,7 @@ bool KovanSerial::sendFileAction(const std::string &action, const std::string &f
 	}
 	
 	Packet confirm;
-	if(!m_transport->recv(confirm, 15000) || confirm.type != Command::FileActionConfirm) {
+	if(!m_transport->recv(confirm, 10000) || confirm.type != Command::FileActionConfirm) {
 		std::cout << "Didn't receive confirm. Aborting." << std::endl;
 		return false;
 	}

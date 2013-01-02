@@ -19,13 +19,15 @@ Packet::Packet(const uint16_t &type, const uint8_t *data, const size_t &len)
 struct ChecksummedPacket
 {
 	ChecksummedPacket();
-	ChecksummedPacket(const Packet &packet, const uint64_t &order);
+	ChecksummedPacket(const Packet &packet, const uint64_t &order, const uint8_t *password = 0);
 	
 	bool isValid() const;
+	bool isPasswordGood(const uint8_t *password) const;
 	
 	crc_t computeChecksum() const;
 	
 	Packet packet;
+	uint8_t password[16];
 	uint64_t order;
 	crc_t checksum;
 };
@@ -35,16 +37,23 @@ ChecksummedPacket::ChecksummedPacket()
 	checksum(0)
 {}
 
-ChecksummedPacket::ChecksummedPacket(const Packet &packet, const uint64_t &order)
+ChecksummedPacket::ChecksummedPacket(const Packet &packet, const uint64_t &order, const uint8_t *password)
 	: packet(packet),
 	order(order),
 	checksum(computeChecksum())
 {
+	if(!password) return;
+	memcpy(this->password, password, 16);
 }
 
 bool ChecksummedPacket::isValid() const
 {
 	return computeChecksum() == checksum;
+}
+
+bool ChecksummedPacket::isPasswordGood(const uint8_t *password) const
+{
+	return memcmp(this->password, password, 16) == 0;
 }
 
 crc_t ChecksummedPacket::computeChecksum() const
@@ -75,7 +84,8 @@ Ack::Ack(const bool &resend)
 }
 
 TransportLayer::TransportLayer(Transmitter *transmitter)
-	: m_transmitter(transmitter)
+	: m_transmitter(transmitter),
+	m_authMode(TransportLayer::AuthClient)
 {
 }
 
@@ -83,14 +93,36 @@ TransportLayer::~TransportLayer()
 {
 }
 
+void TransportLayer::setAuthMode(TransportLayer::AuthMode authMode)
+{
+	m_authMode = authMode;
+}
+
+TransportLayer::AuthMode TransportLayer::authMode() const
+{
+	return m_authMode;
+}
+
+void TransportLayer::setPassword(const uint8_t *password)
+{
+	memcpy(m_password, password, 16);
+}
+
+const uint8_t *TransportLayer::password() const
+{
+	return m_password;
+}
+
 bool TransportLayer::send(const Packet &p)
 {
-	ChecksummedPacket ckp(p, m_order++);
+	ChecksummedPacket ckp(p, m_order++, m_authMode == TransportLayer::AuthClient ? m_password : 0);
 	
 	if(!m_transmitter->write(ckp)) {
 		std::cerr << "TransportLayer::send failed to write packet." << std::endl;
 		return false;
 	}
+	
+	if(m_transmitter->isReliable()) return true;
 	
 	Ack ack;
 	uint8_t tries = 0;
@@ -118,12 +150,17 @@ bool TransportLayer::recv(Packet &p, const uint32_t &timeout)
 	Ack ack;
 	do {
 		if(!m_transmitter->read(ckp, timeout)) return false;
+		if(m_authMode == TransportLayer::AuthServer && !ckp.isPasswordGood(m_password)) {
+			std::cout << "Passwords don't match" << std::endl;
+			return false;
+		}
+		p = ckp.packet;
+		if(m_transmitter->isReliable()) return true;
 		ack.resend = !ckp.isValid();
 		if(!m_transmitter->write(ack)) {
 			std::cout << "Writing ack failed" << std::endl;
 			return false;
 		}
-		p = ckp.packet;
 		if(ack.resend) {
 			std::cout << "Wrote ack with resend = " << ack.resend << std::endl;
 		}

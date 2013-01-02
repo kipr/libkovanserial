@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-	UdpAdvertiser advertiser;
+	UdpAdvertiser advertiser(true);
 	Advert myself("???", "1.0", "computer", "beta");
 	for(;;) {
 		std::cout << "pulse" << std::endl;

@@ -40,6 +40,8 @@ public:
 	}
 	
 	virtual bool makeAvailable() = 0;
+	virtual void endSession() = 0;
+	virtual bool isReliable() const = 0;
 	virtual bool available() const = 0;
 	virtual ssize_t write(const uint8_t *data, const size_t &len) = 0;
 	virtual ssize_t read(uint8_t *data, const size_t &len) = 0;

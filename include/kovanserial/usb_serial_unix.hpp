@@ -10,6 +10,8 @@ public:
 	~UsbSerialUnix();
 	
 	virtual bool makeAvailable();
+	virtual void endSession();
+	virtual bool isReliable() const;
 	virtual void close();
 	virtual bool available() const;
 	

@@ -27,7 +27,7 @@ struct IncomingAdvert
 class UdpAdvertiser
 {
 public:
-	UdpAdvertiser();
+	UdpAdvertiser(bool onlyPulse);
 	~UdpAdvertiser();
 	
 	bool pulse(const Advert &ad);
@@ -37,6 +37,7 @@ public:
 private:
 	void setupSocket();
 	
+	bool m_onlyPulse;
 	int m_fd;
 	sockaddr_in m_group;
 };

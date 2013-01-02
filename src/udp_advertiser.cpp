@@ -1,6 +1,8 @@
 #include "kovanserial/udp_advertiser.hpp"
 #include "kovanserial/general.hpp"
 
+#include "socket_utils.hpp"
+
 #include <arpa/inet.h>
 #include <sys/unistd.h>
 #include <sys/fcntl.h>
@@ -28,8 +30,9 @@ Advert::Advert(const char *serial, const char *version,
 	strncpy(this->name, name, 32);
 }
 
-UdpAdvertiser::UdpAdvertiser()
-	: m_fd(-1)
+UdpAdvertiser::UdpAdvertiser(bool onlyPulse)
+	: m_onlyPulse(onlyPulse),
+	m_fd(-1)
 {
 	memset(&m_group, 0, sizeof(m_group));
 	m_group.sin_family = AF_INET;
@@ -61,6 +64,7 @@ std::list<IncomingAdvert> UdpAdvertiser::sample(const unsigned long &milli)
 			(sockaddr *)&sender, &addrlen) < 0) {
 			if(errno == EAGAIN) continue;
 			perror("recvfrom");
+			return ret;
 		}
 		ad.sender = sender;
 		ret.push_back(ad);
@@ -86,19 +90,22 @@ void UdpAdvertiser::setupSocket()
 	uint32_t yes = 1;
 	setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
 	
-	if(fcntl(m_fd, F_SETFL, O_NONBLOCK) < 0) {
+	if(!setBlocking(m_fd, false)) {
 		perror("fnctl");
-		close(m_fd);
+		closeSocket(m_fd);
 		m_fd = -1;
 		return;
 	}
 	
+	if(m_onlyPulse) return;
+	
 	sockaddr_in groupBind = m_group;
 	groupBind.sin_addr.s_addr = htonl(INADDR_ANY);
 	
-	if (bind(m_fd, (sockaddr *) &groupBind, sizeof(groupBind)) < 0) {
+	uint16_t tries = 0;
+	if(bind(m_fd, (sockaddr *)&groupBind, sizeof(groupBind)) < 0) {
 		perror("bind");
-		close(m_fd);
+		closeSocket(m_fd);
 		m_fd = -1;
 		return;
 	}
@@ -108,7 +115,7 @@ void UdpAdvertiser::setupSocket()
 	mreq.imr_interface.s_addr = htonl(INADDR_ANY);
 	if(setsockopt(m_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0) {
 		perror("setsockopt");
-		close(m_fd);
+		closeSocket(m_fd);
 		m_fd = -1;
 		return;
 	}

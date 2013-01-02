@@ -16,13 +16,15 @@ public:
 	KovanSerial(TransportLayer *transport);
 	~KovanSerial();
 	
+	bool hasAuthentication();
+	
 	bool sendProperty(const std::string &name, const std::string &value);
 	bool property(const std::string &name, std::string &value);
 	
 	bool sendPropertyList(const std::list<std::string> &names);
 	bool listProperties(std::list<std::string> &names);
 	
-	bool sendFile(const std::string &dest, std::istream *in);
+	bool sendFile(const std::string &dest, const std::string &metadata, std::istream *in);
 	bool confirmFile(const bool &good);
 	bool recvFile(const size_t &size, std::ostream *out, const uint32_t &timeout = 0);
 	

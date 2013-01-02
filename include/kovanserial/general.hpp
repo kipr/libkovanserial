@@ -2,5 +2,6 @@
 #define _GENERAL_HPP_
 
 long msystime();
+void yield();
 
 #endif

@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 	
 	server.bind("1234");
 	server.listen(1);
-	while(server.accept()) {
+	while(server.accept(0)) {
 		for(;;) {
 			Packet p;
 			if(!proto.next(p, 5000)) break;

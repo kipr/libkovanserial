@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 		}
 		char path[500];
 		sprintf(path, "%s/%s", argv[3], argv[2]);
-		if(!proto.sendFile(path, &file)) {
+		if(!proto.sendFile(path, "", &file)) {
 			std::cout << "Send failed" << std::endl;
 		}
 		file.close();

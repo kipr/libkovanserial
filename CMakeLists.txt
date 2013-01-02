@@ -12,6 +12,7 @@ file(GLOB SOURCES
 	src/tcp.cpp
 	src/tcp_server.cpp
 	src/transmitter.cpp
+	src/socket_utils.cpp
 	src/kovan_server.cpp
 	src/udp_advertiser.cpp
 	src/tcp_serial.cpp
