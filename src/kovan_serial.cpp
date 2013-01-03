@@ -14,6 +14,20 @@ KovanSerial::~KovanSerial()
 	
 }
 
+bool KovanSerial::knockKnock(uint32_t timeout)
+{
+	char dummy = 0;
+	if(!m_transport->send(Packet(Command::KnockKnock, dummy))) return false;
+	Packet p;
+	return m_transport->recv(p, timeout) && p.type == Command::WhosThere;
+}
+
+bool KovanSerial::whosThere()
+{
+	char dummy = 0;
+	return m_transport->send(Packet(Command::WhosThere, dummy));
+}
+
 bool KovanSerial::hasAuthentication()
 {
 	

@@ -20,6 +20,8 @@ namespace Command
 	enum Type
 	{
 		None = 0,
+		KnockKnock,
+		WhosThere,
 		Hangup,
 		FileAction,
 		FileActionConfirm,

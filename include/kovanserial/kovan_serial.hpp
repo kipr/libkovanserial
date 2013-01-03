@@ -16,6 +16,9 @@ public:
 	KovanSerial(TransportLayer *transport);
 	~KovanSerial();
 	
+	bool knockKnock(uint32_t timeout = 0);
+	bool whosThere();
+	
 	bool hasAuthentication();
 	
 	bool sendProperty(const std::string &name, const std::string &value);
