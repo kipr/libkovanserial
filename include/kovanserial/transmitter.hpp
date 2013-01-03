@@ -34,6 +34,7 @@ public:
 				pos += ret;
 				startTime = endTime;
 			}
+			yield();
 		} while(pos < sizeof(T));
 		
 		return true;
