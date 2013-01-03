@@ -1,5 +1,6 @@
 #include "kovanserial/tcp_server.hpp"
 
+#include "kovanserial/general.hpp"
 #include "socket_utils.hpp"
 
 #ifdef WIN32
@@ -58,6 +59,7 @@ bool TcpServer::accept(uint64_t timeout)
 	int fd = -1;
 	do {
 		fd = ::accept(m_ourFd, (sockaddr *)&addr, &size);
+		yield();
 	} while(fd < 0 && errno == EAGAIN && (timeout == 0 || msystime() - start < timeout));
 	
 	if(fd < 0) return false;
