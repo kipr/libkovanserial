@@ -5,6 +5,7 @@
 
 #define COMMAND_ACTION_RUN ("run")
 #define COMMAND_ACTION_COMPILE ("compile")
+#define COMMAND_ACTION_READ ("read")
 
 #define KOVAN_PROPERTY_DISPLAY_NAME ("dsnm")
 #define KOVAN_PROPERTY_VERSION ("version")
