@@ -121,7 +121,7 @@ bool KovanSerial::sendFile(const std::string &dest, const std::string &metadata,
 	std::cout << "Sening file..." << std::endl;
 	uint8_t buffer[TRANSPORT_MAX_DATA_SIZE];
 	size_t i = 0;
-	while(!in->eof() && !in->fail()) {
+	while(!in->eof() && i < header.size) {
 		in->read(reinterpret_cast<char *>(buffer), TRANSPORT_MAX_DATA_SIZE);
 		i += in->gcount();
 		if(!m_transport->send(Packet(Command::File,
