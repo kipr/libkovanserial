@@ -161,7 +161,7 @@ bool TransportLayer::recv(Packet &p, const uint32_t &timeout)
 			return false;
 		}
 		if(ack.resend) {
-			std::cout << "Wrote ack with resend = " << ack.resend << std::endl;
+			std::cout << "Wrote ack with resend = " << ack.resend << " (got packet " << p.type << ")" << std::endl;
 		}
 	} while(ack.resend);
 	
