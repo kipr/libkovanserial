@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 		std::cout << "confirmFile failed" << std::endl;
 		return EXIT_FAILURE;
 	}
-	std::cout << "reading " << header.size << std::endl;
+	
 	if(!proto.recvFile(header.size, &out, 10000)) {
 		std::cout << "recvFile failed" << std::endl;
 		return EXIT_FAILURE;
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	
 	out.close();
 	
-	//proto.hangup();
+	proto.hangup();
 	
 	std::cout << "Done!" << std::endl;
 	

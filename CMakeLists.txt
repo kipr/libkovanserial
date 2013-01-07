@@ -20,6 +20,8 @@ file(GLOB SOURCES
 
 add_definitions(-g -pg)
 
+set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
+
 if(UNIX)
 	set(SOURCES ${SOURCES} src/usb_serial_unix.cpp)
 elseif(WIN32)

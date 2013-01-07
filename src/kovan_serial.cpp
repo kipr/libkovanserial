@@ -146,10 +146,8 @@ bool KovanSerial::recvFile(const size_t &size, std::ostream *out, const uint32_t
 {
 	size_t i = 0;
 	
-	std::cout << "Reading file packets." << std::endl;
 	Packet p;
 	while(i < size) {
-		std::cout << "Got " << i << " of " << size << std::endl;
 		if(!m_transport->recv(p, timeout)) {
 			std::cout << "recvFile timed out" << std::endl;
 			return false;
@@ -164,7 +162,6 @@ bool KovanSerial::recvFile(const size_t &size, std::ostream *out, const uint32_t
 			std::min(TRANSPORT_MAX_DATA_SIZE, size - i));
 		i += TRANSPORT_MAX_DATA_SIZE;
 	}
-	std::cout << "Got " << i << " of " << size << std::endl;
 	
 	return true;
 }
