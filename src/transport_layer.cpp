@@ -140,7 +140,7 @@ bool TransportLayer::send(const Packet &p)
 		std::cout << "resend..." << std::endl;
 	}
 	
-	return tries < 10;
+	return tries < 5;
 }
 
 bool TransportLayer::recv(Packet &p, const uint32_t &timeout)
