@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
 	
 	out.close();
 	
+	proto.hangup();
+	
 	std::cout << "Done!" << std::endl;
 	
 	return EXIT_SUCCESS;
