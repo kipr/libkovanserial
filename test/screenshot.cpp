@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	TransportLayer transport(&serial);
 	KovanSerial proto(&transport);
 	
-	if(!proto.sendFileAction("read", "/dev/fb0")) {
+	if(!proto.sendFileAction(COMMAND_ACTION_SCREENSHOT, "")) {
 		std::cout << "sendFileAction failed" << std::endl;
 		return EXIT_FAILURE;
 	}
