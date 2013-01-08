@@ -3,12 +3,20 @@
 
 #include "socket_utils.hpp"
 
-#include <arpa/inet.h>
-#include <sys/unistd.h>
-#include <sys/fcntl.h>
-#include <errno.h>
+#ifdef WIN32
+#define _WIN32_WINNT 0x0501
+#include <winsock2.h>
+#include <winsock.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#endif
+
 #include <stdio.h>
-#include <string.h>
 
 #define AD_PORT 12345
 #define AD_GROUP "225.0.0.37"
@@ -48,8 +56,8 @@ UdpAdvertiser::~UdpAdvertiser()
 
 bool UdpAdvertiser::pulse(const Advert &ad)
 {
-	return sendto(m_fd, &ad, sizeof(ad), 0, (sockaddr *)&m_group,
-		sizeof(m_group)) < 0;
+	return sendto(m_fd, reinterpret_cast<const char *>(&ad),
+		sizeof(ad), 0, (sockaddr *)&m_group, sizeof(m_group)) < 0;
 }
 
 std::list<IncomingAdvert> UdpAdvertiser::sample(const unsigned long &milli)
@@ -60,8 +68,8 @@ std::list<IncomingAdvert> UdpAdvertiser::sample(const unsigned long &milli)
 		IncomingAdvert ad;
 		sockaddr_in sender;
 		socklen_t addrlen = sizeof(sender);
-		if(recvfrom(m_fd, &(ad.ad), sizeof(Advert), 0,
-			(sockaddr *)&sender, &addrlen) < 0) {
+		if(recvfrom(m_fd, reinterpret_cast<char *>(&(ad.ad)),
+			sizeof(Advert), 0, (sockaddr *)&sender, &addrlen) < 0) {
 			if(errno == EAGAIN) continue;
 			perror("recvfrom");
 			return ret;
@@ -79,7 +87,7 @@ void UdpAdvertiser::reset()
 
 void UdpAdvertiser::setupSocket()
 {
-	if(m_fd >= 0) ::close(m_fd);
+	if(m_fd >= 0) closeSocket(m_fd);
 	
 	m_fd = socket(AF_INET, SOCK_DGRAM, 0);
 	if(m_fd < 0) {
@@ -88,7 +96,8 @@ void UdpAdvertiser::setupSocket()
 	}
 	
 	uint32_t yes = 1;
-	setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+	setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char *>(&yes),
+		sizeof(yes));
 	
 	if(!setBlocking(m_fd, false)) {
 		perror("fnctl");
@@ -113,7 +122,7 @@ void UdpAdvertiser::setupSocket()
 	ip_mreq mreq;
 	mreq.imr_multiaddr.s_addr = inet_addr(AD_GROUP);
 	mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-	if(setsockopt(m_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0) {
+	if(setsockopt(m_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, reinterpret_cast<const char *>(&mreq), sizeof(mreq)) < 0) {
 		perror("setsockopt");
 		closeSocket(m_fd);
 		m_fd = -1;

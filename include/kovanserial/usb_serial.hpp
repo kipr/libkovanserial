@@ -3,7 +3,7 @@
 
 #ifdef WIN32
 #include "usb_serial_win.hpp"
-typedef UsbSerialWindows UsbSerial;
+typedef UsbSerialWin UsbSerial;
 #else
 #include "usb_serial_unix.hpp"
 typedef UsbSerialUnix UsbSerial;

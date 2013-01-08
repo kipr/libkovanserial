@@ -1,6 +1,6 @@
 #include <kovanserial/kovan_serial.hpp>
 #include <kovanserial/transport_layer.hpp>
-#include <kovanserial/usb_serial_unix.hpp>
+#include <kovanserial/usb_serial.hpp>
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 	
-	UsbSerialUnix usb(argv[1]);
+	UsbSerial usb(argv[1]);
 	if(!usb.makeAvailable()) {
 		std::cout << "Failed to open serial port" << std::endl;
 		return EXIT_FAILURE;
@@ -74,6 +74,6 @@ int main(int argc, char *argv[])
 		std::cout << "type = " << p.type << std::endl;
 	}
 	
-	usb.close();
+	usb.endSession();
 	return EXIT_SUCCESS;
 }

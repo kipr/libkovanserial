@@ -32,13 +32,13 @@ bool Tcp::available() const
 ssize_t Tcp::write(const uint8_t *data, const size_t &len)
 {
 	if(!available()) return -1;
-	return send(m_fd, data, len, 0);
+	return send(m_fd, reinterpret_cast<const char *>(data), len, 0);
 }
 
 ssize_t Tcp::read(uint8_t *data, const size_t &len)
 {
 	if(!available()) return -1;
-	return recv(m_fd, data, len, 0);
+	return recv(m_fd, reinterpret_cast<char *>(data), len, 0);
 }
 
 void Tcp::closeFd()

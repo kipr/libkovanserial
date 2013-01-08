@@ -1,7 +1,10 @@
 #include "kovanserial/tcp_serial.hpp"
 
 #ifdef WIN32
+#define _WIN32_WINNT 0x0501
 #include <winsock2.h>
+#include <winsock.h>
+#include <ws2tcpip.h>
 #include <windows.h>
 #else
 #include <sys/types.h>
