@@ -101,13 +101,16 @@ bool KovanSerial::sendFile(const std::string &dest, const std::string &metadata,
 	header.size = in->tellg();
 	in->seekg(0, std::ios::beg);
 	
+	std::cout << "Sending file header." << std::endl;
 	if(!m_transport->send(Packet(Command::FileHeader, header))) return false;
 	
+	std::cout << "Waiting on confirm..." << std::endl;
 	Packet confirm;
 	if(!m_transport->recv(confirm, 15000) || confirm.type != Command::FileConfirm) {
 		std::cout << "Didn't receive confirm. Aborting.";
 		return false;
 	}
+	std::cout << "Got confirm packet." << std::endl;
 	
 	bool good = false;
 	confirm.as(good);
@@ -115,15 +118,18 @@ bool KovanSerial::sendFile(const std::string &dest, const std::string &metadata,
 		std::cout << "Other side rejected our transfer." << std::endl;
 		return false;
 	}
-	
+	std::cout << "Sening file..." << std::endl;
 	uint8_t buffer[TRANSPORT_MAX_DATA_SIZE];
-	while(!in->eof() && !in->fail()) {
+	size_t i = 0;
+	while(!in->eof() && i < header.size) {
 		in->read(reinterpret_cast<char *>(buffer), TRANSPORT_MAX_DATA_SIZE);
+		i += in->gcount();
 		if(!m_transport->send(Packet(Command::File,
 			buffer, TRANSPORT_MAX_DATA_SIZE))) {
 			std::cout << "sending file packet failed" << std::endl;
 			return false;
 		}
+		std::cout << "Sent " << i << " of " << header.size << std::endl;
 	}
 	
 	std::cout << "Finished writing entire file" << std::endl;

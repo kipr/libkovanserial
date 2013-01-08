@@ -70,7 +70,6 @@ struct Ack
 	Ack();
 	Ack(const bool &resend);
 	
-	bool error : 1;
 	bool resend : 1;
 };
 
@@ -141,7 +140,7 @@ bool TransportLayer::send(const Packet &p)
 		std::cout << "resend..." << std::endl;
 	}
 	
-	return tries < 10;
+	return tries < 5;
 }
 
 bool TransportLayer::recv(Packet &p, const uint32_t &timeout)
@@ -162,7 +161,7 @@ bool TransportLayer::recv(Packet &p, const uint32_t &timeout)
 			return false;
 		}
 		if(ack.resend) {
-			std::cout << "Wrote ack with resend = " << ack.resend << std::endl;
+			std::cout << "Wrote ack with resend = " << ack.resend << " (got packet " << p.type << ")" << std::endl;
 		}
 	} while(ack.resend);
 	
