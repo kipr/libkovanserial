@@ -14,9 +14,11 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #endif
 
 #include <stdio.h>
+#include <errno.h>
 
 #define AD_PORT 12345
 #define AD_GROUP "225.0.0.37"
