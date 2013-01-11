@@ -4,6 +4,7 @@
 #include "general.hpp"
 #include <errno.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <sys/types.h>
 
 class Transmitter
@@ -29,7 +30,10 @@ public:
 			if(timeout > 0 && endTime - startTime > timeout) return false;
 			
 			ssize_t ret = read(reinterpret_cast<uint8_t *>(&t) + pos, sizeof(T) - pos);
-			if(ret < 0 && errno != EAGAIN) return false;
+			if(ret < 0 && errno != EAGAIN) {
+				perror("Transmitter::read");
+				return false;
+			}
 			if(ret > 0) {
 				pos += ret;
 				startTime = endTime;
