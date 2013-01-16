@@ -18,6 +18,7 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 
 #define AD_PORT 12345

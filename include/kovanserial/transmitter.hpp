@@ -4,6 +4,7 @@
 #include "general.hpp"
 #include <errno.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <sys/types.h>
 
 #ifdef WIN32
