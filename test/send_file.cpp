@@ -22,17 +22,22 @@ int main(int argc, char *argv[])
 		std::cout << argv[0] << " device [file dest]" << std::endl;
 		return EXIT_FAILURE;
 	}
+
+	std::cout << "Opening serial port..." << std::endl;
 	
 	UsbSerial usb(argv[1]);
 	if(!usb.makeAvailable()) {
 		std::cout << "Failed to open serial port" << std::endl;
 		return EXIT_FAILURE;
 	}
-	
+	std::cout << "good!" << std::endl;
+
 	TransportLayer transport(&usb);
 	KovanSerial proto(&transport);
 	
+
 	if(argc == 4) {
+		std::cout << "Sending file" << std::endl;
 		std::ifstream file(argv[2], std::ios::binary);
 		if(!file.is_open()) {
 			std::cout << "Couldn't open " << argv[2] << std::endl;
@@ -47,6 +52,7 @@ int main(int argc, char *argv[])
 		return EXIT_SUCCESS;
 	}
 	
+	std::cout << "Starting as server" << std::endl;
 	for(;;) {
 		Packet p;
 		if(!proto.next(p, 1000)) continue;

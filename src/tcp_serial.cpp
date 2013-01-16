@@ -15,6 +15,7 @@
 
 #include <unistd.h>
 #include <string.h>
+#include <iostream>
 
 TcpSerial::TcpSerial(const char *host, const char *service)
 {
@@ -25,16 +26,19 @@ TcpSerial::TcpSerial(const char *host, const char *service)
 bool TcpSerial::makeAvailable()
 {
 	closeFd();
-	setFd(socket(PF_INET, SOCK_STREAM, 0));
+	setFd(socket(PF_INET, SOCK_STREAM, IPPROTO_TCP));
 	addrinfo hints;
 	addrinfo *res;
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	getaddrinfo(m_host, m_service, &hints, &res);
-	bool ret = ::connect(fd(), res->ai_addr, res->ai_addrlen) == 0;
+	bool ret = ::connect(fd(), res->ai_addr, res->ai_addrlen);
+#ifdef WIN32
+	std::cout << "makeAvail ret = " << ret << " " << WSAGetLastError() << std::endl;
+#endif
 	freeaddrinfo(res);
-	return ret;
+	return ret == 0;
 }
 
 

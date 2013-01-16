@@ -98,8 +98,8 @@ void UdpAdvertiser::setupSocket()
 	}
 	
 	uint32_t yes = 1;
-	setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char *>(&yes),
-		sizeof(yes));
+	setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR,
+		reinterpret_cast<const char *>(&yes), sizeof(yes));
 	
 	if(!setBlocking(m_fd, false)) {
 		perror("fnctl");
@@ -124,7 +124,8 @@ void UdpAdvertiser::setupSocket()
 	ip_mreq mreq;
 	mreq.imr_multiaddr.s_addr = inet_addr(AD_GROUP);
 	mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-	if(setsockopt(m_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, reinterpret_cast<const char *>(&mreq), sizeof(mreq)) < 0) {
+	if(setsockopt(m_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+		reinterpret_cast<const char *>(&mreq), sizeof(mreq)) < 0) {
 		perror("setsockopt");
 		closeSocket(m_fd);
 		m_fd = -1;

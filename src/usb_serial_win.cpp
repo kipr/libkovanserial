@@ -48,7 +48,7 @@ bool UsbSerialWin::makeAvailable()
 
 	if(m_handle == INVALID_HANDLE_VALUE) return false;
 
-	cto.ReadIntervalTimeout = 10; // This value has been set arbitrarily
+	cto.ReadIntervalTimeout = MAXDWORD;
 	cto.ReadTotalTimeoutMultiplier = 0;
 	cto.ReadTotalTimeoutConstant = 0;
 	cto.WriteTotalTimeoutMultiplier = 0;
@@ -133,7 +133,7 @@ ssize_t UsbSerialWin::read(uint8_t *data, const size_t &size)
 		std::cerr << "ReadFile failed" << std::endl;
 		return 0;
 	}
-	std::cerr << "Readfile returned " << read_count << std::endl;
+	if(read_count) std::cerr << "Readfile returned " << read_count << std::endl;
 	return read_count;
 	
 }

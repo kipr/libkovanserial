@@ -19,11 +19,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <iostream>
 
 TcpServer::TcpServer()
 	: m_ourFd(-1)
 {
-	m_ourFd = socket(PF_INET, SOCK_STREAM, 0);
+	m_ourFd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	setBlocking(m_ourFd, false);
 }
 
@@ -44,14 +45,30 @@ bool TcpServer::bind(const char *port)
 	hints.ai_flags = AI_PASSIVE;
 	if(getaddrinfo(NULL, port, &hints, &res) != 0) return false;
 	
-	bool ret = ::bind(m_ourFd, res->ai_addr, res->ai_addrlen) == 0;
+	sockaddr_in service;
+	service.sin_family = AF_INET;
+    service.sin_addr.s_addr = INADDR_ANY;
+    service.sin_port = htons(8374);
+
+	int ret = 0;
+
+	
+#ifdef WIN32
+	ret = ::bind(m_ourFd, (sockaddr *)&service, sizeof(service));
+	std::cout << "bind returned " << ret << " on our fd of "
+		<< m_ourFd << " " << WSAGetLastError() << std::endl;
+#else
+	ret = ::bind(m_ourFd, &res->sin_addr, sizeof(res->sin_addr));
+#endif
 	freeaddrinfo(res);
-	return ret;
+	return ret == 0;
 }
 
 bool TcpServer::listen(const int &backLog)
 {
-	return ::listen(m_ourFd, backLog) == 0;
+	int ret = ::listen(m_ourFd, backLog);
+	std::cout << "Listen returned " << ret << std::endl;
+	return ret == 0;
 }
 
 bool TcpServer::accept(uint64_t timeout)
@@ -62,6 +79,12 @@ bool TcpServer::accept(uint64_t timeout)
 	int fd = -1;
 	do {
 		fd = ::accept(m_ourFd, (sockaddr *)&addr, &size);
+		// std::cout << "accept = " << WSAGetLastError() << std::endl;
+		if(errno == EAGAIN
+#ifdef Q_OS_WIN
+			|| WSAGetLastError() == WSAEWOULDBLOCK
+#endif
+			) continue;
 		yield();
 	} while(fd < 0 && errno == EAGAIN && (timeout == 0 || msystime() - start < timeout));
 	

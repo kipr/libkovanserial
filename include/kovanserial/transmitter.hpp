@@ -6,6 +6,10 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+#ifdef WIN32
+#include <winsock2.h>
+#endif
+
 class Transmitter
 {
 public:
@@ -29,7 +33,13 @@ public:
 			if(timeout > 0 && endTime - startTime > timeout) return false;
 			
 			ssize_t ret = read(reinterpret_cast<uint8_t *>(&t) + pos, sizeof(T) - pos);
-			if(ret < 0 && errno != EAGAIN) return false;
+			if(ret < 0
+#ifdef WIN32
+				&& WSAGetLastError() != WSAEWOULDBLOCK
+#else
+				&& errno != EAGAIN
+#endif
+				) return false;
 			if(ret > 0) {
 				pos += ret;
 				startTime = endTime;

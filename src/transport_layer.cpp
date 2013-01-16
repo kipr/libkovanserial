@@ -114,23 +114,27 @@ const uint8_t *TransportLayer::password() const
 
 bool TransportLayer::send(const Packet &p)
 {
+	std::cout << "Creating checksummed packet" << std::endl;
 	ChecksummedPacket ckp(p, m_order++, m_authMode == TransportLayer::AuthClient ? m_password : 0);
 	
+	std::cout << "Writing packet" << std::endl;
 	if(!m_transmitter->write(ckp)) {
 		std::cerr << "TransportLayer::send failed to write packet." << std::endl;
 		return false;
 	}
+	std::cout << "Finished writing packet!" << std::endl;
 	
 	if(m_transmitter->isReliable()) return true;
 	
 	Ack ack;
 	uint8_t tries = 0;
 	for(; tries < 5; ++tries) {
+		std::cout << "Waiting on ack..." << std::endl;
 		if(!m_transmitter->read(ack, 1000)) {
 			std::cout << "Reading ack failed" << std::endl;
 			continue;
 		}
-		
+		std::cout << "Got an ack!" << std::endl;
 		if(!ack.resend) break;
 		if(!m_transmitter->write(ckp)) {
 			std::cout << "Resend failed" << std::endl;
@@ -161,7 +165,8 @@ bool TransportLayer::recv(Packet &p, const uint32_t &timeout)
 			return false;
 		}
 		if(ack.resend) {
-			std::cout << "Wrote ack with resend = " << ack.resend << " (got packet " << p.type << ")" << std::endl;
+			std::cout << "Wrote ack with resend = " << ack.resend << " (got packet "
+				<< p.type << ")" << std::endl;
 		}
 	} while(ack.resend);
 	
