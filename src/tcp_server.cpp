@@ -45,10 +45,11 @@ bool TcpServer::bind(const char *port)
 	hints.ai_flags = AI_PASSIVE;
 	if(getaddrinfo(NULL, port, &hints, &res) != 0) return false;
 	
+	// TODO: This is a temporary windows hack. addrinfo problems?
 	sockaddr_in service;
 	service.sin_family = AF_INET;
-    service.sin_addr.s_addr = INADDR_ANY;
-    service.sin_port = htons(8374);
+	service.sin_addr.s_addr = INADDR_ANY;
+	service.sin_port = htons(8374);
 
 	int ret = 0;
 
@@ -58,7 +59,7 @@ bool TcpServer::bind(const char *port)
 	std::cout << "bind returned " << ret << " on our fd of "
 		<< m_ourFd << " " << WSAGetLastError() << std::endl;
 #else
-	ret = ::bind(m_ourFd, &res->sin_addr, sizeof(res->sin_addr));
+	ret = ::bind(m_ourFd, res->ai_addr, res->ai_addrlen);
 #endif
 	freeaddrinfo(res);
 	return ret == 0;
