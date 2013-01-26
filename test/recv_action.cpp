@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 	double progress = 0.0;
 	do {
 		finished = progress >= 1.0;
-		if(!proto.sendFileActionProgress(finished, progress)) {
+		if(!proto.recvFileActionProgress(finished, progress)) {
 			std::cout << "Send file action progress failed" << std::endl;
 			return EXIT_FAILURE;
 		}

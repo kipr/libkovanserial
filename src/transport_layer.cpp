@@ -147,6 +147,8 @@ Transmitter::Return TransportLayer::send(const Packet &p)
 		std::cout << "resend..." << std::endl;
 	}
 	
+	std::cout << "Send finished with tries = " << (int)tries << std::endl;
+	
 	return tries < 5 ? Transmitter::Success : Transmitter::Timeout;
 }
 
