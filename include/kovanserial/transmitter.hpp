@@ -4,12 +4,7 @@
 #include "general.hpp"
 #include <errno.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <sys/types.h>
-
-#ifdef WIN32
-#include <winsock2.h>
-#endif
 
 class Transmitter
 {
@@ -23,7 +18,7 @@ public:
 	virtual ~Transmitter();
 	
 	template<typename T>
-	inline bool write(const T &t)
+	inline Transmitter::Return write(const T &t)
 	{
 		if(!available()) return Transmitter::Error;
 		return write(reinterpret_cast<const uint8_t *>(&t), sizeof(T)) >= 0 ? Transmitter::Success : Transmitter::Error;

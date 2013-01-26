@@ -102,11 +102,11 @@ bool KovanSerial::sendFile(const std::string &dest, const std::string &metadata,
 	in->seekg(0, std::ios::beg);
 	
 	std::cout << "Sending file header." << std::endl;
-	if(!m_transport->send(Packet(Command::FileHeader, header))) return false;
+	if(m_transport->send(Packet(Command::FileHeader, header)) != Transmitter::Success) return false;
 	
 	std::cout << "Waiting on confirm..." << std::endl;
 	Packet confirm;
-	if(!m_transport->recv(confirm, 15000) || confirm.type != Command::FileConfirm) {
+	if(m_transport->recv(confirm, 15000) != Transmitter::Success || confirm.type != Command::FileConfirm) {
 		std::cout << "Didn't receive confirm. Aborting.";
 		return false;
 	}
@@ -124,8 +124,8 @@ bool KovanSerial::sendFile(const std::string &dest, const std::string &metadata,
 	while(!in->eof() && i < header.size) {
 		in->read(reinterpret_cast<char *>(buffer), TRANSPORT_MAX_DATA_SIZE);
 		i += in->gcount();
-		if(!m_transport->send(Packet(Command::File,
-			buffer, TRANSPORT_MAX_DATA_SIZE))) {
+		if(m_transport->send(Packet(Command::File,
+			buffer, TRANSPORT_MAX_DATA_SIZE)) != Transmitter::Success) {
 			std::cout << "sending file packet failed" << std::endl;
 			return false;
 		}
@@ -204,7 +204,7 @@ bool KovanSerial::sendFileActionProgress(const bool &finished, const double &pro
 	Command::FileActionProgressData data;
 	data.finished = finished;
 	data.progress = progress;
-	return m_transport->send(Packet(Command::FileActionProgress, data));
+	return m_transport->send(Packet(Command::FileActionProgress, data)) == Transmitter::Success;
 }
 
 bool KovanSerial::recvFileActionProgress(bool &finished, double &progress, const uint32_t &timeout)

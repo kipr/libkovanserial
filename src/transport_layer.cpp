@@ -114,15 +114,15 @@ const uint8_t *TransportLayer::password() const
 
 Transmitter::Return TransportLayer::send(const Packet &p)
 {
-	std::cout << "Creating checksummed packet" << std::endl;
+	// std::cout << "Creating checksummed packet" << std::endl;
 	ChecksummedPacket ckp(p, m_order++, m_authMode == TransportLayer::AuthClient ? m_password : 0);
 	
-	std::cout << "Writing packet" << std::endl;
-	if(!m_transmitter->write(ckp)) {
+	// std::cout << "Writing packet" << std::endl;
+	if(m_transmitter->write(ckp) != Transmitter::Success) {
 		std::cerr << "TransportLayer::send failed to write packet." << std::endl;
 		return Transmitter::Error;
 	}
-	std::cout << "Finished writing packet!" << std::endl;
+	// std::cout << "Finished writing packet!" << std::endl;
 	
 	if(m_transmitter->isReliable()) return Transmitter::Success;
 	
@@ -134,10 +134,12 @@ Transmitter::Return TransportLayer::send(const Packet &p)
 		if(ret == Transmitter::Timeout) {
 			std::cout << "Reading ack failed" << std::endl;
 			continue;
-		} else if(ret == Transmitter::Error) return Transmitter::Error;
+		}
+		if(ret != Transmitter::Success) return ret;
+		
 		std::cout << "Got an ack!" << std::endl;
 		if(!ack.resend) break;
-		if(!m_transmitter->write(ckp)) {
+		if(m_transmitter->write(ckp) != Transmitter::Success) {
 			std::cout << "Resend failed" << std::endl;
 			return Transmitter::Error;
 		}
@@ -154,7 +156,10 @@ Transmitter::Return TransportLayer::recv(Packet &p, const uint32_t &timeout)
 	Ack ack;
 	do {
 		Transmitter::Return ret = m_transmitter->read(ckp, timeout);
-		if(ret != Transmitter::Success) return ret;
+		if(ret != Transmitter::Success) {
+			std::cout << "Reading ckp failed." << std::endl;
+			return ret;
+		}
 		if(m_authMode == TransportLayer::AuthServer && !ckp.isPasswordGood(m_password)) {
 			std::cout << "Passwords don't match" << std::endl;
 			return Transmitter::Error;
@@ -162,7 +167,7 @@ Transmitter::Return TransportLayer::recv(Packet &p, const uint32_t &timeout)
 		p = ckp.packet;
 		if(m_transmitter->isReliable()) return Transmitter::Success;
 		ack.resend = !ckp.isValid();
-		if(!m_transmitter->write(ack)) {
+		if(m_transmitter->write(ack) != Transmitter::Success) {
 			std::cout << "Writing ack failed" << std::endl;
 			return Transmitter::Error;
 		}

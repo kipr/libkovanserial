@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}
 		std::cout << "progress: " << progress << std::endl;
-		progress += 0.1;
 	} while(!finished);
 	
 	std::cout << "Done!" << std::endl;

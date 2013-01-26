@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}
 		progress += 0.033;
-		//sleep(1.0);
+		sleep(1.0);
 	}
 	if(!proto.sendFileActionProgress(true, progress)) {
 		std::cout << "Send file action progress failed" << std::endl;
