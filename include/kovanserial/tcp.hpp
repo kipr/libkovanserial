@@ -10,8 +10,11 @@ public:
 	~Tcp();
 	
 	bool available() const;
-	ssize_t write(const uint8_t *data, const size_t &len);
-	ssize_t read(uint8_t *data, const size_t &len);
+	
+	ssize_t readBlock(uint8_t *data, const size_t len, const uint32_t timeout = 0);
+	
+	ssize_t write(const uint8_t *data, const size_t len);
+	ssize_t read(uint8_t *data, const size_t len);
 	
 protected:
 	void closeFd();

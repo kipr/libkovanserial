@@ -124,7 +124,28 @@ void UsbSerialWin::configure()
 	SetCommState(m_handle, &dcb);
 }
 
-ssize_t UsbSerialWin::read(uint8_t *data, const size_t &size)
+ssize_t UsbSerialWin::readBlock(uint8_t *data, const size_t len, const uint32_t timeout)
+{
+	if(!available()) return -1;
+	size_t pos = 0;
+	long startTime = msystime();
+	do {
+		long endTime = msystime();
+		if(timeout > 0 && endTime - startTime > timeout) return pos;
+
+		ssize_t ret = read(data + pos, len - pos);
+		if(ret < 0 && errno != EAGAIN) return ret;
+		if(ret > 0) {
+			pos += ret;
+			startTime = endTime;
+		}
+		yield();
+	} while(pos < len);
+
+	return pos;
+}
+
+ssize_t UsbSerialWin::read(uint8_t *data, const size_t size)
 {
 	if(m_handle == INVALID_HANDLE_VALUE) return -1;
 	DWORD read_count = 0;
@@ -138,7 +159,7 @@ ssize_t UsbSerialWin::read(uint8_t *data, const size_t &size)
 	
 }
 
-ssize_t UsbSerialWin::write(const uint8_t *data, const size_t &size)
+ssize_t UsbSerialWin::write(const uint8_t *data, const size_t size)
 {
 	if(m_handle == INVALID_HANDLE_VALUE) return -1;
 	DWORD write_count;

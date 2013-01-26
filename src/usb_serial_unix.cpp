@@ -1,10 +1,11 @@
 #include "kovanserial/usb_serial_unix.hpp"
 
+
+#include <unistd.h>
+#include <stdio.h>
 #include <termios.h>
 #include <string.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
 
 UsbSerialUnix::UsbSerialUnix(const char *dev)
 	: m_fd(-1)
@@ -53,12 +54,33 @@ bool UsbSerialUnix::available() const
 	return m_fd >= 0;
 }
 
-ssize_t UsbSerialUnix::write(const uint8_t *data, const size_t &len)
+ssize_t UsbSerialUnix::readBlock(uint8_t *data, const size_t len, const uint32_t timeout)
+{
+	if(!available()) return -1;
+	size_t pos = 0;
+	long startTime = msystime();
+	do {
+		long endTime = msystime();
+		if(timeout > 0 && endTime - startTime > timeout) return pos;
+
+		ssize_t ret = read(data + pos, len - pos);
+		if(ret < 0 && errno != EAGAIN) return ret;
+		if(ret > 0) {
+			pos += ret;
+			startTime = endTime;
+		}
+		yield();
+	} while(pos < len);
+
+	return pos;
+}
+
+ssize_t UsbSerialUnix::write(const uint8_t *data, const size_t len)
 {
 	return ::write(m_fd, data, len);
 }
 
-ssize_t UsbSerialUnix::read(uint8_t *data, const size_t &len)
+ssize_t UsbSerialUnix::read(uint8_t *data, const size_t len)
 {
 	return ::read(m_fd, data, len);
 }

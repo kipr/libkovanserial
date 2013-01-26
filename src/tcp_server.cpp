@@ -40,7 +40,7 @@ bool TcpServer::bind(const char *port)
 	addrinfo hints;
 	addrinfo *res;
 	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC;
+	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 	if(getaddrinfo(NULL, port, &hints, &res) != 0) return false;

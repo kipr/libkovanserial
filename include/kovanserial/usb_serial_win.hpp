@@ -17,8 +17,10 @@ public:
 	virtual bool isReliable() const;
 	virtual bool available() const;
 	
-	virtual ssize_t write(const uint8_t *data, const size_t &len);
-	virtual ssize_t read(uint8_t *data, const size_t &len);
+	virtual ssize_t readBlock(uint8_t *data, const size_t len, const uint32_t timeout = 0);
+	
+	virtual ssize_t write(const uint8_t *data, const size_t len);
+	virtual ssize_t read(uint8_t *data, const size_t len);
 	
 private:
 	void configure();

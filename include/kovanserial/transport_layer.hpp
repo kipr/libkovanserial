@@ -4,6 +4,7 @@
 #define TRANSPORT_MAX_DATA_SIZE ((size_t)512)
 
 #include "crc.h"
+#include "transmitter.hpp"
 
 #include <algorithm>
 #include <string.h>
@@ -50,8 +51,8 @@ public:
 	void setPassword(const uint8_t *password);
 	const uint8_t *password() const;
 	
-	virtual bool send(const Packet &p);
-	virtual bool recv(Packet &p, const uint32_t &timeout = 0);
+	virtual Transmitter::Return send(const Packet &p);
+	virtual Transmitter::Return recv(Packet &p, const uint32_t &timeout = 0);
 	
 private:
 	Transmitter *m_transmitter;

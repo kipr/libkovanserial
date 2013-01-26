@@ -17,20 +17,20 @@ KovanSerial::~KovanSerial()
 bool KovanSerial::knockKnock(uint32_t timeout)
 {
 	char dummy = 0;
-	if(!m_transport->send(Packet(Command::KnockKnock, dummy))) return false;
+	if(m_transport->send(Packet(Command::KnockKnock, dummy)) != Transmitter::Success) return false;
 	Packet p;
-	return m_transport->recv(p, timeout) && p.type == Command::WhosThere;
+	return m_transport->recv(p, timeout) == Transmitter::Success && p.type == Command::WhosThere;
 }
 
 bool KovanSerial::whosThere()
 {
 	char dummy = 0;
-	return m_transport->send(Packet(Command::WhosThere, dummy));
+	return m_transport->send(Packet(Command::WhosThere, dummy)) == Transmitter::Success;
 }
 
 bool KovanSerial::hasAuthentication()
 {
-	
+	return false;
 }
 
 bool KovanSerial::sendProperty(const std::string &name, const std::string &value)
@@ -38,7 +38,7 @@ bool KovanSerial::sendProperty(const std::string &name, const std::string &value
 	Command::PropertyValuePairData data;
 	strncpy(data.name, name.c_str(), 8);
 	strncpy(data.value, value.c_str(), 128);
-	if(!m_transport->send(Packet(Command::Property, data))) {
+	if(m_transport->send(Packet(Command::Property, data)) != Transmitter::Success) {
 		std::cout << "Failed to send property" << std::endl;
 		return false;
 	}
@@ -49,13 +49,13 @@ bool KovanSerial::property(const std::string &name, std::string &value)
 {
 	Command::PropertyData data;
 	strncpy(data.name, name.c_str(), 8);
-	if(!m_transport->send(Packet(Command::Property, data))) {
+	if(m_transport->send(Packet(Command::Property, data)) != Transmitter::Success) {
 		std::cout << "Failed to send property request" << std::endl;
 		return false;
 	}
 	
 	Packet p;
-	if(!m_transport->recv(p, 1000) || p.type != Command::Property) {
+	if(m_transport->recv(p, 1000) != Transmitter::Success || p.type != Command::Property) {
 		std::cout << "Did not receive property value pair" << std::endl;
 		return false;
 	}
@@ -80,7 +80,7 @@ bool KovanSerial::sendPropertyList(const std::list<std::string> &names)
 		data.names[i] = entry;
 	}
 	
-	if(!m_transport->send(Packet(Command::Property, data))) {
+	if(m_transport->send(Packet(Command::Property, data)) != Transmitter::Success) {
 		std::cout << "Failed to send property" << std::endl;
 		return false;
 	}
@@ -139,7 +139,7 @@ bool KovanSerial::sendFile(const std::string &dest, const std::string &metadata,
 
 bool KovanSerial::confirmFile(const bool &good)
 {
-	return m_transport->send(Packet(Command::FileConfirm, good));
+	return m_transport->send(Packet(Command::FileConfirm, good)) == Transmitter::Success;
 }
 
 bool KovanSerial::recvFile(const size_t &size, std::ostream *out, const uint32_t &timeout)
@@ -148,7 +148,7 @@ bool KovanSerial::recvFile(const size_t &size, std::ostream *out, const uint32_t
 	
 	Packet p;
 	while(i < size) {
-		if(!m_transport->recv(p, timeout)) {
+		if(m_transport->recv(p, timeout) != Transmitter::Success) {
 			std::cout << "recvFile timed out" << std::endl;
 			return false;
 		}
@@ -172,13 +172,13 @@ bool KovanSerial::sendFileAction(const std::string &action, const std::string &f
 	strncpy(data.action, action.c_str(), 8);
 	strncpy(data.dest, file.c_str(), 500);
 	
-	if(!m_transport->send(Packet(Command::FileAction, data))) {
+	if(m_transport->send(Packet(Command::FileAction, data)) != Transmitter::Success) {
 		std::cout << "Failed to send file action" << std::endl;
 		return false;
 	}
 	
 	Packet confirm;
-	if(!m_transport->recv(confirm, 10000) || confirm.type != Command::FileActionConfirm) {
+	if(m_transport->recv(confirm, 10000) != Transmitter::Success || confirm.type != Command::FileActionConfirm) {
 		std::cout << "Didn't receive confirm. Aborting." << std::endl;
 		return false;
 	}
@@ -196,7 +196,7 @@ bool KovanSerial::sendFileAction(const std::string &action, const std::string &f
 bool KovanSerial::confirmFileAction(const bool &good)
 {
 	return m_transport->send(Packet(Command::FileActionConfirm,
-		reinterpret_cast<const uint8_t *>(&good), sizeof(bool)));
+		reinterpret_cast<const uint8_t *>(&good), sizeof(bool))) == Transmitter::Success;
 }
 
 bool KovanSerial::sendFileActionProgress(const bool &finished, const double &progress)
@@ -210,7 +210,7 @@ bool KovanSerial::sendFileActionProgress(const bool &finished, const double &pro
 bool KovanSerial::recvFileActionProgress(bool &finished, double &progress, const uint32_t &timeout)
 {
 	Packet p;
-	if(!m_transport->recv(p, timeout) || p.type != Command::FileActionProgress) {
+	if(m_transport->recv(p, timeout) != Transmitter::Success || p.type != Command::FileActionProgress) {
 		std::cout << "Couldn't recv file action progress" << std::endl;
 		return false;
 	}
@@ -226,7 +226,7 @@ bool KovanSerial::recvFileActionProgress(bool &finished, double &progress, const
 
 bool KovanSerial::next(Packet &p, const uint32_t &timeout)
 {
-	return m_transport->recv(p, timeout);
+	return m_transport->recv(p, timeout) == Transmitter::Success;
 }
 
 void KovanSerial::hangup()
