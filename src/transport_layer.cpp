@@ -149,7 +149,7 @@ Transmitter::Return TransportLayer::send(const Packet &p)
 	
 	std::cout << "Send finished with tries = " << (int)tries << std::endl;
 	
-	return tries < 5 ? Transmitter::Success : Transmitter::Timeout;
+	return (tries < 5) ? Transmitter::Success : Transmitter::Timeout;
 }
 
 Transmitter::Return TransportLayer::recv(Packet &p, const uint32_t &timeout)

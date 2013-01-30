@@ -1,6 +1,7 @@
 #include <kovanserial/usb_serial.hpp>
 #include <kovanserial/transport_layer.hpp>
 #include <kovanserial/kovan_serial.hpp>
+#include <unistd.h>
 
 #include <iostream>
 
