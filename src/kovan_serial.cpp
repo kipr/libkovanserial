@@ -21,8 +21,7 @@ KovanSerial::~KovanSerial()
 
 bool KovanSerial::knockKnock(uint32_t timeout)
 {
-	char dummy = 0;
-	if(error(m_transport->send(Packet(Command::KnockKnock, dummy)))) return false;
+	if(error(m_transport->send(Packet(Command::KnockKnock), true))) return false;
 	Packet p;
 	return !error(m_transport->recv(p, timeout)) && p.type == Command::WhosThere;
 }
@@ -30,7 +29,36 @@ bool KovanSerial::knockKnock(uint32_t timeout)
 bool KovanSerial::whosThere()
 {
 	char dummy = 0;
-	return !error(m_transport->send(Packet(Command::WhosThere, dummy)));
+	return !error(m_transport->send(Packet(Command::WhosThere, dummy), true));
+}
+
+bool KovanSerial::protocolVersion(std::string &version)
+{
+	if(error(m_transport->send(Packet(Command::RequestProtocolVersion), true))) return false;
+	Packet p;
+	if(error(m_transport->recv(p, 2000)) && p.type != Command::ProtocolVersion) {
+		std::cerr << "Failed to recv protocol version" << std::endl;
+		return false;
+	}
+	
+	Command::ProtocolVersionData data;
+	p.as(data);
+	
+	// Make sure we're nulled (in case of malicious data)
+	data.version[sizeof(data.version) - 1] = 0;
+	
+	version = data.version;
+	
+	return true;
+}
+
+bool KovanSerial::sendProtocolVersion()
+{
+	Command::ProtocolVersionData data;
+	memset(data.version, 0, sizeof(data.version));
+	strncpy(data.version, KOVAN_SERIAL_PROTOCOL_VERSION, 64);
+	if(error(m_transport->send(Packet(Command::ProtocolVersion, data), true))) return false;
+	return true;
 }
 
 bool KovanSerial::setPassword(const std::string &password)

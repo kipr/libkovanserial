@@ -9,6 +9,7 @@
 #include <kovanserial/command_types.hpp>
 
 #define KOVAN_SERIAL_PORT "8374"
+#define KOVAN_SERIAL_PROTOCOL_VERSION "2"
 
 class KovanSerial
 {
@@ -18,6 +19,9 @@ public:
 	
 	bool knockKnock(uint32_t timeout = 0);
 	bool whosThere();
+	
+	bool protocolVersion(std::string &version);
+	bool sendProtocolVersion();
 	
 	bool setPassword(const std::string &password);
 	void setNoPassword();
@@ -51,6 +55,7 @@ public:
 	
 	void hangup();
 	void clearSession();
+
 	
 private:
 	bool error(const TransportLayer::Return ret);

@@ -38,7 +38,9 @@ namespace Command
 		RequestAuthenticationInfo,
 		AuthenticationInfo,
 		RequestAuthentication,
-		ConfirmAuthentication
+		ConfirmAuthentication,
+		RequestProtocolVersion,
+		ProtocolVersion
 	};
 	
 	struct PropertyData
@@ -92,6 +94,11 @@ namespace Command
 	{
 		bool success;
 		uint8_t scrambledSessionKey[KOVAN_SERIAL_SESSION_KEY_SIZE];
+	};
+	
+	struct ProtocolVersionData
+	{
+		char version[65];
 	};
 }
 
