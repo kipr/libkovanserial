@@ -74,13 +74,13 @@ bool KovanSerial::authenticationInfo(bool &authNecessary)
 {
 	clearSession();
 	
-	if(error(m_transport->send(Packet(Command::RequestAuthenticationInfo)))) {
+	if(error(m_transport->send(Packet(Command::RequestAuthenticationInfo), true))) {
 		std::cout << "Failed to send auth info request" << std::endl;
 		return false;
 	}
 	
 	Packet p;
-	if(error(m_transport->recv(p, 500)) || p.type != Command::AuthenticationInfo) {
+	if(error(m_transport->recv(p, 2000)) || p.type != Command::AuthenticationInfo) {
 		std::cout << "Did not receive authentication info" << std::endl;
 		return false;
 	}
@@ -100,7 +100,7 @@ bool KovanSerial::sendAuthenticationInfo(const bool authNecessary)
 	Command::AuthenticationInfoData data;
 	data.authNecessary = authNecessary;
 	
-	if(error(m_transport->send(Packet(Command::AuthenticationInfo, data)))) {
+	if(error(m_transport->send(Packet(Command::AuthenticationInfo, data), true))) {
 		std::cout << "Failed to send auth info" << std::endl;
 		return false;
 	}
@@ -117,7 +117,7 @@ bool KovanSerial::requestAuthentication(bool &success, uint8_t *const sessionKey
 	Command::RequestAuthenticationData req;
 	memcpy(req.password, m_md5, 16);
 	
-	if(error(m_transport->send(Packet(Command::RequestAuthentication, req)))) {
+	if(error(m_transport->send(Packet(Command::RequestAuthentication, req), true))) {
 		std::cout << "Failed to send auth info request" << std::endl;
 		return false;
 	}
@@ -155,7 +155,7 @@ bool KovanSerial::confirmAuthentication(const bool success)
 		xor_crypt::crypt(sessionKey, data.scrambledSessionKey,
 			KOVAN_SERIAL_SESSION_KEY_SIZE, m_md5, sizeof(m_md5));
 	}
-	if(error(m_transport->send(Packet(Command::ConfirmAuthentication, data)))) {
+	if(error(m_transport->send(Packet(Command::ConfirmAuthentication, data), true))) {
 		std::cout << "Failed to send auth confirm" << std::endl;
 		return false;
 	}
@@ -363,7 +363,7 @@ TransportLayer::Return  KovanSerial::next(Packet &p, const uint32_t &timeout)
 
 void KovanSerial::hangup()
 {
-	m_transport->send(Packet(Command::Hangup));
+	m_transport->send(Packet(Command::Hangup), true);
 	clearSession();
 }
 

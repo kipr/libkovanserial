@@ -52,7 +52,7 @@ public:
 	const uint8_t *key() const;
 	uint64_t keySize() const;
 	
-	virtual Return send(const Packet &p);
+	virtual Return send(const Packet &p, const bool forceUntrusted = false);
 	virtual Return recv(Packet &p, const uint32_t &timeout = 0);
 	
 private:

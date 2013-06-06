@@ -148,7 +148,7 @@ uint64_t TransportLayer::keySize() const
 	return m_keySize;
 }
 
-TransportLayer::Return TransportLayer::send(const Packet &p)
+TransportLayer::Return TransportLayer::send(const Packet &p, const bool forceUntrusted)
 {
 	MD5 tmp;
 	tmp.update(reinterpret_cast<const uint8_t *>(&p), sizeof(p));
@@ -161,7 +161,7 @@ TransportLayer::Return TransportLayer::send(const Packet &p)
 	std::cout << std::endl;
 	
 	// If we have a key, encrypt the packet
-	ChecksummedPacket ckp = m_key
+	ChecksummedPacket ckp = m_key && !forceUntrusted
 		? ChecksummedPacket(p, m_order, m_key, m_keySize)
 		: ChecksummedPacket(p, m_order);
 	++m_order;

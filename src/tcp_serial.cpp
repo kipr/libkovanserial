@@ -37,7 +37,8 @@ bool TcpSerial::makeAvailable()
 	getaddrinfo(m_host, m_service, &hints, &res);
 	bool ret = ::connect(fd(), res->ai_addr, res->ai_addrlen);
 	if(fcntl(fd(), F_SETFL, O_NONBLOCK) < 0) perror("set non-blocking");
-	
+	const int v = 1;
+	if(setsockopt(fd(), SOL_SOCKET, SO_REUSEADDR, &v, sizeof(v)) < 0) perror("reuseaddr");
 	
 #ifdef WIN32
 	std::cout << "makeAvail ret = " << ret << " " << WSAGetLastError() << std::endl;

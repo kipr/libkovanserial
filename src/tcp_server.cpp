@@ -63,7 +63,10 @@ bool TcpServer::bind(const char *port)
 #else
 	ret = ::bind(m_ourFd, res->ai_addr, res->ai_addrlen);
 #endif
+	
 	if(fcntl(m_ourFd, F_SETFL, O_NONBLOCK) < 0) perror("set non-blocking");
+	const int v = 1;
+	if(setsockopt(m_ourFd, SOL_SOCKET, SO_REUSEADDR, &v, sizeof(v)) < 0) perror("reuseaddr");
 	
 	freeaddrinfo(res);
 	return ret == 0;
