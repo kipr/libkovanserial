@@ -1,7 +1,0 @@
-\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.2}{User Passwords}{}% 2
-\BOOKMARK [1][-]{section.3}{Authentication Handshake}{}% 3
-\BOOKMARK [2][-]{subsection.3.1}{Handshake Example}{section.3}% 4
-\BOOKMARK [1][-]{section.4}{Backwards Compatibility}{}% 5
-\BOOKMARK [2][-]{subsection.4.1}{Out-of-date Servers \(Old KIPR Link firmwares\)}{section.4}% 6
-\BOOKMARK [2][-]{subsection.4.2}{Out-of-date Clients \(Old versions of KISS IDE\)}{section.4}% 7
