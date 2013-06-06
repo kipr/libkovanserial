@@ -12,6 +12,7 @@
 struct Packet
 {
 	Packet();
+	Packet(const uint16_t &type);
 	Packet(const uint16_t &type, const uint8_t *data, const size_t &len);
 	
 	template<typename T>
@@ -37,29 +38,31 @@ class Transmitter;
 class TransportLayer
 {
 public:
-	enum AuthMode {
-		AuthClient,
-		AuthServer
+	enum Return {
+		Success = 0,
+		UntrustedSuccess,
+		Error,
+		Timeout
 	};
 	
 	TransportLayer(Transmitter *transmitter);
 	virtual ~TransportLayer();
 	
-	void setAuthMode(TransportLayer::AuthMode authMode);
-	TransportLayer::AuthMode authMode() const;
+	void setKey(const uint8_t *key, const uint64_t keySize);
+	const uint8_t *key() const;
+	uint64_t keySize() const;
 	
-	void setPassword(const uint8_t *password);
-	const uint8_t *password() const;
-	
-	virtual Transmitter::Return send(const Packet &p);
-	virtual Transmitter::Return recv(Packet &p, const uint32_t &timeout = 0);
+	virtual Return send(const Packet &p);
+	virtual Return recv(Packet &p, const uint32_t &timeout = 0);
 	
 private:
+	static Return fromTransmitterReturn(const Transmitter::Return ret);
+	
 	Transmitter *m_transmitter;
 	uint64_t m_order;
 	
-	AuthMode m_authMode;
-	uint8_t m_password[16];
+	uint8_t *m_key;
+	uint64_t m_keySize;
 };
 
 #endif

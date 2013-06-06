@@ -13,6 +13,8 @@
 #define KOVAN_PROPERTY_DEVICE ("device")
 #define KOVAN_PROPERTY_SERIAL ("serial")
 
+#define KOVAN_SERIAL_SESSION_KEY_SIZE (64)
+
 #define AUTH_TYPE_AUTHED 1
 #define AUTH_TYPE_NEED_SECRET 2
 #define AUTH_TYPE_GO_AWAY 3
@@ -32,7 +34,11 @@ namespace Command
 		Property,
 		FileHeader,
 		FileConfirm,
-		File
+		File,
+		RequestAuthenticationInfo,
+		AuthenticationInfo,
+		RequestAuthentication,
+		ConfirmAuthentication
 	};
 	
 	struct PropertyData
@@ -69,6 +75,23 @@ namespace Command
 	{
 		bool finished;
 		double progress;
+	};
+	
+	struct AuthenticationInfoData
+	{
+		bool authNecessary;
+	};
+	
+	struct RequestAuthenticationData
+	{
+		// MD5 hash
+		uint8_t password[16];
+	};
+	
+	struct ConfirmAuthenticationData
+	{
+		bool success;
+		uint8_t scrambledSessionKey[KOVAN_SERIAL_SESSION_KEY_SIZE];
 	};
 }
 

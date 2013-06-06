@@ -16,7 +16,11 @@ file(GLOB SOURCES
 	src/kovan_server.cpp
 	src/udp_advertiser.cpp
 	src/tcp_serial.cpp
-	src/crc.c)
+	src/crc.c
+        src/md5.cpp
+        src/sha1.cpp
+        src/randomize.cpp
+        src/xor.cpp)
 
 add_definitions(-g -pg)
 

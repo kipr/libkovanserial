@@ -1,7 +1,11 @@
 #include "kovanserial/transport_layer.hpp"
 
 #include "kovanserial/transmitter.hpp"
+#include "kovanserial/xor.hpp"
+#include "kovanserial/randomize.hpp"
 #include <iostream>
+
+#include "kovanserial/md5.hpp"
 
 #include <string.h>
 
@@ -9,25 +13,36 @@ Packet::Packet()
 	: type(0)
 {}
 
+Packet::Packet(const uint16_t &type)
+	: type(type)
+{
+	randomize::fill(data, TRANSPORT_MAX_DATA_SIZE);
+}
+
 Packet::Packet(const uint16_t &type, const uint8_t *data, const size_t &len)
 	: type(type)
 {
+	randomize::fill(this->data, TRANSPORT_MAX_DATA_SIZE);
 	if(!data) return;
 	memcpy(this->data, data, std::min(len, TRANSPORT_MAX_DATA_SIZE));
-}
+} 
 
 struct ChecksummedPacket
 {
 	ChecksummedPacket();
-	ChecksummedPacket(const Packet &packet, const uint64_t &order, const uint8_t *password = 0);
+	ChecksummedPacket(const Packet &packet, const uint64_t &order);
+	ChecksummedPacket(const Packet &packet, const uint64_t &order, const uint8_t *const key,
+		const uint64_t keySize);
 	
 	bool isValid() const;
-	bool isPasswordGood(const uint8_t *password) const;
+	bool isEncrypted() const;
+	void decrypt(const uint8_t *const key, const uint64_t keySize);
 	
 	crc_t computeChecksum() const;
 	
 	Packet packet;
-	uint8_t password[16];
+	uint8_t encrypted;
+	uint8_t unused[15];
 	uint64_t order;
 	crc_t checksum;
 };
@@ -37,13 +52,24 @@ ChecksummedPacket::ChecksummedPacket()
 	checksum(0)
 {}
 
-ChecksummedPacket::ChecksummedPacket(const Packet &packet, const uint64_t &order, const uint8_t *password)
+ChecksummedPacket::ChecksummedPacket(const Packet &packet, const uint64_t &order)
 	: packet(packet),
 	order(order),
-	checksum(computeChecksum())
+	checksum(computeChecksum()),
+	encrypted(0)
 {
-	if(!password) return;
-	memcpy(this->password, password, 16);
+	randomize::fill(unused, sizeof(unused));
+}
+
+ChecksummedPacket::ChecksummedPacket(const Packet &packet, const uint64_t &order, const uint8_t *const key,
+	const uint64_t keySize)
+	: packet(packet),
+	order(order),
+	checksum(computeChecksum()),
+	encrypted(1)
+{
+	xor_crypt::crypt(this->packet, key, keySize);
+	randomize::fill(unused, sizeof(unused));
 }
 
 bool ChecksummedPacket::isValid() const
@@ -51,16 +77,23 @@ bool ChecksummedPacket::isValid() const
 	return computeChecksum() == checksum;
 }
 
-bool ChecksummedPacket::isPasswordGood(const uint8_t *password) const
+bool ChecksummedPacket::isEncrypted() const
 {
-	return memcmp(this->password, password, 16) == 0;
+	return encrypted ? true : false;
+}
+
+void ChecksummedPacket::decrypt(const uint8_t *const key, const uint64_t keySize)
+{
+	if(!encrypted || !key) return;
+	xor_crypt::crypt(packet, key, keySize);
+	encrypted = 0;
 }
 
 crc_t ChecksummedPacket::computeChecksum() const
 {
 	crc_t c = crc_init();
-	c = crc_update(c, reinterpret_cast<const unsigned char *>(&packet), sizeof(Packet));
-	c = crc_update(c, reinterpret_cast<const unsigned char *>(&order), sizeof(uint64_t));
+	c = crc_update(c, reinterpret_cast<const uint8_t *>(&packet), sizeof(Packet));
+	c = crc_update(c, reinterpret_cast<const uint8_t *>(&order), sizeof(uint64_t));
 	c = crc_finalize(c);
 	return c;
 }
@@ -71,6 +104,7 @@ struct Ack
 	Ack(const bool &resend);
 	
 	bool resend : 1;
+	bool rejected : 1;
 };
 
 Ack::Ack()
@@ -84,7 +118,8 @@ Ack::Ack(const bool &resend)
 
 TransportLayer::TransportLayer(Transmitter *transmitter)
 	: m_transmitter(transmitter),
-	m_authMode(TransportLayer::AuthClient)
+	m_key(0),
+	m_keySize(0)
 {
 }
 
@@ -92,39 +127,51 @@ TransportLayer::~TransportLayer()
 {
 }
 
-void TransportLayer::setAuthMode(TransportLayer::AuthMode authMode)
+void TransportLayer::setKey(const uint8_t *key, const uint64_t size)
 {
-	m_authMode = authMode;
+	delete[] m_key;
+	m_key = 0;
+	m_keySize = 0;
+	if(!key || size < 1) return;
+	m_keySize = size;
+	m_key = new uint8_t[size];
+	memcpy(m_key, key, size);
 }
 
-TransportLayer::AuthMode TransportLayer::authMode() const
+const uint8_t *TransportLayer::key() const
 {
-	return m_authMode;
+	return m_key;
 }
 
-void TransportLayer::setPassword(const uint8_t *password)
+uint64_t TransportLayer::keySize() const
 {
-	memcpy(m_password, password, 16);
+	return m_keySize;
 }
 
-const uint8_t *TransportLayer::password() const
+TransportLayer::Return TransportLayer::send(const Packet &p)
 {
-	return m_password;
-}
-
-Transmitter::Return TransportLayer::send(const Packet &p)
-{
-	// std::cout << "Creating checksummed packet" << std::endl;
-	ChecksummedPacket ckp(p, m_order++, m_authMode == TransportLayer::AuthClient ? m_password : 0);
+	MD5 tmp;
+	tmp.update(reinterpret_cast<const uint8_t *>(&p), sizeof(p));
+	tmp.finalize();
 	
-	// std::cout << "Writing packet" << std::endl;
+	std::cout << "Sent packet MD5: ";
+	for(unsigned i = 0; i < 16; ++i) {
+		std::cout << std::hex << (uint16_t)tmp.digest()[i];
+	}
+	std::cout << std::endl;
+	
+	// If we have a key, encrypt the packet
+	ChecksummedPacket ckp = m_key
+		? ChecksummedPacket(p, m_order, m_key, m_keySize)
+		: ChecksummedPacket(p, m_order);
+	++m_order;
+	
 	if(m_transmitter->write(ckp) != Transmitter::Success) {
 		std::cerr << "TransportLayer::send failed to write packet." << std::endl;
-		return Transmitter::Error;
+		return TransportLayer::Error;
 	}
-	// std::cout << "Finished writing packet!" << std::endl;
 	
-	if(m_transmitter->isReliable()) return Transmitter::Success;
+	if(m_transmitter->isReliable()) return TransportLayer::Success;
 	
 	Ack ack;
 	uint8_t tries = 0;
@@ -135,13 +182,13 @@ Transmitter::Return TransportLayer::send(const Packet &p)
 			std::cout << "Reading ack failed" << std::endl;
 			continue;
 		}
-		if(ret != Transmitter::Success) return ret;
+		if(ret != Transmitter::Success) return fromTransmitterReturn(ret);
 		
 		std::cout << "Got an ack!" << std::endl;
 		if(!ack.resend) break;
 		if(m_transmitter->write(ckp) != Transmitter::Success) {
 			std::cout << "Resend failed" << std::endl;
-			return Transmitter::Error;
+			return TransportLayer::Error;
 		}
 		
 		std::cout << "resend..." << std::endl;
@@ -149,29 +196,48 @@ Transmitter::Return TransportLayer::send(const Packet &p)
 	
 	std::cout << "Send finished with tries = " << (int)tries << std::endl;
 	
-	return (tries < 5) ? Transmitter::Success : Transmitter::Timeout;
+	return fromTransmitterReturn((tries < 5) ? Transmitter::Success : Transmitter::Timeout);
 }
 
-Transmitter::Return TransportLayer::recv(Packet &p, const uint32_t &timeout)
+TransportLayer::Return TransportLayer::recv(Packet &p, const uint32_t &timeout)
 {
 	ChecksummedPacket ckp;
 	Ack ack;
+	bool encrypted = false;
 	do {
 		Transmitter::Return ret = m_transmitter->read(ckp, timeout);
+		std::cout << ret << std::endl;
 		if(ret != Transmitter::Success) {
 			std::cout << "Reading ckp failed." << std::endl;
-			return ret;
+			return fromTransmitterReturn(ret);
 		}
-		if(m_authMode == TransportLayer::AuthServer && !ckp.isPasswordGood(m_password)) {
-			std::cout << "Passwords don't match" << std::endl;
-			return Transmitter::Error;
-		}
+		
+		// Decrypt must be called before other operations
+		encrypted = ckp.isEncrypted();
+		ckp.decrypt(m_key, m_keySize);
 		p = ckp.packet;
-		if(m_transmitter->isReliable()) return Transmitter::Success;
+		
+		MD5 tmp;
+		tmp.update(reinterpret_cast<const uint8_t *>(&p), sizeof(p));
+		tmp.finalize();
+	
+		std::cout << "Recved packet MD5: ";
+		for(unsigned i = 0; i < 16; ++i) {
+			std::cout << std::hex << (uint16_t)tmp.digest()[i];
+		}
+		std::cout << std::endl;
+		
+		if(m_transmitter->isReliable()) {
+			std::cout << "Packet delivered. Encrypted? " << encrypted << std::endl;
+			return encrypted
+				? TransportLayer::Success
+				: TransportLayer::UntrustedSuccess;
+		}
+		
 		ack.resend = !ckp.isValid();
 		if(m_transmitter->write(ack) != Transmitter::Success) {
 			std::cout << "Writing ack failed" << std::endl;
-			return Transmitter::Error;
+			return TransportLayer::Error;
 		}
 		if(ack.resend) {
 			std::cout << "Wrote ack with resend = " << ack.resend << " (got packet "
@@ -179,5 +245,17 @@ Transmitter::Return TransportLayer::recv(Packet &p, const uint32_t &timeout)
 		}
 	} while(ack.resend);
 	
-	return Transmitter::Success;
+	return encrypted
+		? TransportLayer::Success
+		: TransportLayer::UntrustedSuccess;
+}
+
+TransportLayer::Return TransportLayer::fromTransmitterReturn(const Transmitter::Return ret)
+{
+	switch(ret) {
+	case Transmitter::Success: return TransportLayer::Success;
+	case Transmitter::Error: return TransportLayer::Error;
+	case Transmitter::Timeout: return TransportLayer::Timeout;
+	}
+	return TransportLayer::Error;
 }

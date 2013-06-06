@@ -11,6 +11,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <fcntl.h>
 #endif
 
 #include <unistd.h>
@@ -34,6 +35,9 @@ bool TcpSerial::makeAvailable()
 	hints.ai_socktype = SOCK_STREAM;
 	getaddrinfo(m_host, m_service, &hints, &res);
 	bool ret = ::connect(fd(), res->ai_addr, res->ai_addrlen);
+	if(fcntl(fd(), F_SETFL, O_NONBLOCK) < 0) perror("set non-blocking");
+	
+	
 #ifdef WIN32
 	std::cout << "makeAvail ret = " << ret << " " << WSAGetLastError() << std::endl;
 #endif

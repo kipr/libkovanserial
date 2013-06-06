@@ -14,6 +14,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <fcntl.h>
 #endif
 
 #include <unistd.h>
@@ -61,6 +62,8 @@ bool TcpServer::bind(const char *port)
 #else
 	ret = ::bind(m_ourFd, res->ai_addr, res->ai_addrlen);
 #endif
+	if(fcntl(m_ourFd, F_SETFL, O_NONBLOCK) < 0) perror("set non-blocking");
+	
 	freeaddrinfo(res);
 	return ret == 0;
 }

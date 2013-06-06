@@ -19,7 +19,17 @@ public:
 	bool knockKnock(uint32_t timeout = 0);
 	bool whosThere();
 	
-	bool hasAuthentication();
+	bool setPassword(const std::string &password);
+	void setNoPassword();
+	
+	bool isPassworded() const;
+	const uint8_t *passwordMd5() const;
+	const uint8_t *passwordSha1() const;
+	
+	bool authenticationInfo(bool &authNecessary);
+	bool sendAuthenticationInfo(const bool authNecessary);
+	bool requestAuthentication(bool &success, uint8_t *const sessionKey);
+	bool confirmAuthentication(const bool success);
 	
 	bool sendProperty(const std::string &name, const std::string &value);
 	bool property(const std::string &name, std::string &value);
@@ -37,12 +47,19 @@ public:
 	bool sendFileActionProgress(const bool &finished, const double &progress);
 	bool recvFileActionProgress(bool &finished, double &progress, const uint32_t &timeout = 0);
 	
-	bool next(Packet &p, const uint32_t &timeout = 0);
+	TransportLayer::Return next(Packet &p, const uint32_t &timeout = 0);
 	
 	void hangup();
+	void clearSession();
 	
 private:
+	bool error(const TransportLayer::Return ret);
+	
 	TransportLayer *m_transport;
+	
+	bool m_passworded;
+	uint8_t m_md5[16];
+	uint8_t m_sha1[20];
 };
 
 

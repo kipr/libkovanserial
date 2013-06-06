@@ -1,3 +1,5 @@
+if(build_tests)
+
 add_executable(send_file send_file.cpp)
 target_link_libraries(send_file kovanserial)
 
@@ -21,3 +23,14 @@ target_link_libraries(property_client kovanserial)
 
 add_executable(screenshot screenshot.cpp)
 target_link_libraries(screenshot kovanserial)
+
+add_executable(auth auth.cpp)
+target_link_libraries(auth kovanserial)
+
+enable_testing()
+
+add_executable(sha1_test sha1_test.cpp)
+target_link_libraries(sha1_test kovanserial boost_unit_test_framework-mt boost_test_exec_monitor-mt)
+add_test(sha1 sha1_test)
+
+endif()
