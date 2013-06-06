@@ -214,6 +214,11 @@ TransportLayer::Return TransportLayer::recv(Packet &p, const uint32_t &timeout)
 		
 		// Decrypt must be called before other operations
 		encrypted = ckp.isEncrypted();
+		
+		// If the data is encrypted but we don't have a session key
+		// something is horribly wrong. Ignore the packet.
+		if(encrypted && !m_key) return TransportLayer::Error;
+		
 		ckp.decrypt(m_key, m_keySize);
 		p = ckp.packet;
 		
