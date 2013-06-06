@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <iostream>
+#include <stdio.h>
 
 TcpSerial::TcpSerial(const char *host, const char *service)
 {
