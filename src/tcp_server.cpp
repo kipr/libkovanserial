@@ -21,6 +21,7 @@
 #include <string.h>
 #include <errno.h>
 #include <iostream>
+#include <stdio.h>
 
 TcpServer::TcpServer()
 	: m_ourFd(-1)
