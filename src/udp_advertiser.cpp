@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <iostream>
 
 #define AD_PORT 12345
 #define AD_GROUP "225.0.0.37"
@@ -59,8 +60,14 @@ UdpAdvertiser::~UdpAdvertiser()
 
 bool UdpAdvertiser::pulse(const Advert &ad)
 {
-	return sendto(m_fd, reinterpret_cast<const char *>(&ad),
-		sizeof(ad), 0, (sockaddr *)&m_group, sizeof(m_group)) < 0;
+	int ret = sendto(m_fd, reinterpret_cast<const char *>(&ad),
+		sizeof(ad), 0, (sockaddr *)&m_group, sizeof(m_group));
+	if(ret < 0) {
+#ifdef WIN32
+		std::cout << "WSA Error = " << WSAGetLastError() << std::endl;
+#endif
+	}
+	return ret < 0;
 }
 
 std::list<IncomingAdvert> UdpAdvertiser::sample(const unsigned long &milli)
@@ -73,7 +80,11 @@ std::list<IncomingAdvert> UdpAdvertiser::sample(const unsigned long &milli)
 		socklen_t addrlen = sizeof(sender);
 		if(recvfrom(m_fd, reinterpret_cast<char *>(&(ad.ad)),
 			sizeof(Advert), 0, (sockaddr *)&sender, &addrlen) < 0) {
-			if(errno == EAGAIN) continue;
+			if(errno == EAGAIN
+#ifdef WIN32
+			|| WSAGetLastError() == WSAEWOULDBLOCK	
+#endif
+			) continue;
 			perror("recvfrom");
 			return ret;
 		}
@@ -95,6 +106,9 @@ void UdpAdvertiser::setupSocket()
 	m_fd = socket(AF_INET, SOCK_DGRAM, 0);
 	if(m_fd < 0) {
 		perror("socket");
+#ifdef WIN32
+		std::cout << "Win32 Error: " << WSAGetLastError() << std::endl;
+#endif
 		return;
 	}
 	

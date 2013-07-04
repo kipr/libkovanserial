@@ -32,7 +32,9 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}
 		progress += 0.033;
+#ifndef WIN32
 		sleep(1.0);
+#endif
 	}
 	if(!proto.sendFileActionProgress(true, progress)) {
 		std::cout << "Send file action progress failed" << std::endl;
