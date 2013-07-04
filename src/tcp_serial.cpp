@@ -36,9 +36,14 @@ bool TcpSerial::makeAvailable()
 	hints.ai_socktype = SOCK_STREAM;
 	getaddrinfo(m_host, m_service, &hints, &res);
 	bool ret = ::connect(fd(), res->ai_addr, res->ai_addrlen);
+#ifdef WIN32
+	u_long arg = 1;
+	if(ioctlsocket(fd(), FIONBIO, &arg) < 0) perror("set non-blocking");
+#else
 	if(fcntl(fd(), F_SETFL, O_NONBLOCK) < 0) perror("set non-blocking");
+#endif
 	const int v = 1;
-	if(setsockopt(fd(), SOL_SOCKET, SO_REUSEADDR, &v, sizeof(v)) < 0) perror("reuseaddr");
+	if(setsockopt(fd(), SOL_SOCKET, SO_REUSEADDR, (const char *)&v, sizeof(v)) < 0) perror("reuseaddr");
 	
 #ifdef WIN32
 	std::cout << "makeAvail ret = " << ret << " " << WSAGetLastError() << std::endl;

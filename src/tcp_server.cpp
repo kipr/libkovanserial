@@ -65,9 +65,15 @@ bool TcpServer::bind(const char *port)
 	ret = ::bind(m_ourFd, res->ai_addr, res->ai_addrlen);
 #endif
 	
+#ifdef WIN32
+	u_long arg = 1;
+	if(ioctlsocket(m_ourFd, FIONBIO, &arg) < 0) perror("set non-blocking");
+#else
 	if(fcntl(m_ourFd, F_SETFL, O_NONBLOCK) < 0) perror("set non-blocking");
+#endif
+
 	const int v = 1;
-	if(setsockopt(m_ourFd, SOL_SOCKET, SO_REUSEADDR, &v, sizeof(v)) < 0) perror("reuseaddr");
+	if(setsockopt(m_ourFd, SOL_SOCKET, SO_REUSEADDR, (const char *)&v, sizeof(v)) < 0) perror("reuseaddr");
 	
 	freeaddrinfo(res);
 	return ret == 0;
