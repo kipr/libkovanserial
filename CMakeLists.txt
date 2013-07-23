@@ -47,5 +47,3 @@ ELSE(WIN32)
 install(FILES ${INCLUDES} DESTINATION include/kovanserial)
 install(TARGETS kovanserial LIBRARY DESTINATION lib)
 ENDIF(WIN32)
-
-add_subdirectory(test)
