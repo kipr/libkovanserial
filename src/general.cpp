@@ -1,10 +1,10 @@
 #include "kovanserial/general.hpp"
 
-#include <sys/time.h>
-
 #ifdef WIN32
+#include <time.h>
 #include <windows.h>
 #else
+#include <sys/time.h>
 #include <sched.h>
 #endif
 
