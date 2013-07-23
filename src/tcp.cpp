@@ -1,13 +1,12 @@
 #include "kovanserial/tcp.hpp"
 
-#include <unistd.h>
-
 #include "socket_utils.hpp"
 
 #ifdef WIN32
 #include <winsock2.h>
 #include <windows.h>
 #else
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>

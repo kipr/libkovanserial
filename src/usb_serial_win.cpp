@@ -20,7 +20,10 @@
 
 #include "kovanserial/usb_serial_win.hpp"
 
+#ifndef WIN32
 #include <unistd.h>
+#endif
+
 #include <string.h>
 #include <iostream>
 
