@@ -5,6 +5,7 @@
 
 #ifdef WIN32
 #define _WIN32_WINNT 0x0501
+#include <stdint.h>
 #include <winsock2.h>
 #include <winsock.h>
 #include <ws2tcpip.h>
