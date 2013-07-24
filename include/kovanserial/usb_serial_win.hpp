@@ -2,11 +2,12 @@
 #define _USB_SERIAL_WIN_HPP_
 
 #include "transmitter.hpp"
+#include "export.h"
 
 #include <stdint.h>
 #include <windows.h>
 
-class UsbSerialWin : public Transmitter
+class DLL_EXPORT UsbSerialWin : public Transmitter
 {
 public:
 	UsbSerialWin(const char *dev);

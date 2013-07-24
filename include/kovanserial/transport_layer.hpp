@@ -5,6 +5,7 @@
 
 #include "crc.h"
 #include "transmitter.hpp"
+#include "export.h"
 
 #include <algorithm>
 #include <string.h>
@@ -35,7 +36,7 @@ struct Packet
 
 class Transmitter;
 
-class TransportLayer
+class DLL_EXPORT TransportLayer
 {
 public:
 	enum Return {

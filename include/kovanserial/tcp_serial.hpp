@@ -2,6 +2,7 @@
 #define _TCP_SERIAL_HPP_
 
 #include "tcp.hpp"
+#include "export.h"
 
 #ifdef WIN32
 #define _WIN32_WINNT 0x0501
@@ -13,7 +14,7 @@
 #include <sys/socket.h>
 #endif
 
-class TcpSerial : public Tcp
+class DLL_EXPORT TcpSerial : public Tcp
 {
 public:
 	TcpSerial(const char *host, const char *service);

@@ -8,10 +8,12 @@
 #include <kovanserial/transport_layer.hpp>
 #include <kovanserial/command_types.hpp>
 
+#include "export.h"
+
 #define KOVAN_SERIAL_PORT "8374"
 #define KOVAN_SERIAL_PROTOCOL_VERSION "2"
 
-class KovanSerial
+class DLL_EXPORT KovanSerial
 {
 public:
 	KovanSerial(TransportLayer *transport);

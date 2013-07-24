@@ -3,6 +3,7 @@
 
 #include <string>
 #include <list>
+#include "export.h"
 #ifdef WIN32
 #define _WIN32_WINNT 0x0501
 #include <winsock2.h>
@@ -32,7 +33,7 @@ struct IncomingAdvert
 	sockaddr_in sender;
 };
 
-class UdpAdvertiser
+class DLL_EXPORT UdpAdvertiser
 {
 public:
 	UdpAdvertiser(bool onlyPulse);

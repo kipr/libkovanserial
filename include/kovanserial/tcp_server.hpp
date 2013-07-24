@@ -2,8 +2,9 @@
 #define _TCP_SERVER_HPP_
 
 #include "tcp.hpp"
+#include "export.h"
 
-class TcpServer : public Tcp
+class DLL_EXPORT TcpServer : public Tcp
 {
 public:
 	TcpServer();
