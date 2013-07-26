@@ -1,6 +1,6 @@
 project(libkovanserial)
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.0)
 
 include_directories(include)
 
