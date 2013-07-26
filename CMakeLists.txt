@@ -37,13 +37,13 @@ endif(UNIX)
 
 add_library(kovanserial SHARED ${SOURCES})
 
-IF(WIN32)
+if(WIN32)
 target_link_libraries(kovanserial ws2_32)
 install(FILES ${INCLUDES} DESTINATION ${CMAKE_SOURCE_DIR}/../prefix/include/kovanserial)
-INSTALL(TARGETS kovanserial
+install(TARGETS kovanserial
 	ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/../prefix/lib
 	RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/../prefix/lib)
-ELSE(WIN32)
+else(WIN32)
 install(FILES ${INCLUDES} DESTINATION include/kovanserial)
 install(TARGETS kovanserial LIBRARY DESTINATION lib)
-ENDIF(WIN32)
+endif(WIN32)
