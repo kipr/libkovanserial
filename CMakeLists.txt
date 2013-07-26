@@ -33,7 +33,7 @@ elseif(WIN32)
 	set(CMAKE_SHARED_LINKER_FLAGS "-pg ${CMAKE_SHARED_LINKER_FLAGS}")
 	set(SOURCES ${SOURCES} src/usb_serial_win.cpp)
 #	message(FATAL_ERROR "Windows not supported")
-endif(UNIX)
+endif()
 
 add_library(kovanserial SHARED ${SOURCES})
 
@@ -43,7 +43,7 @@ install(FILES ${INCLUDES} DESTINATION ${CMAKE_SOURCE_DIR}/../prefix/include/kova
 install(TARGETS kovanserial
 	ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/../prefix/lib
 	RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/../prefix/lib)
-else(WIN32)
+else()
 install(FILES ${INCLUDES} DESTINATION include/kovanserial)
 install(TARGETS kovanserial LIBRARY DESTINATION lib)
-endif(WIN32)
+endif()
