@@ -10,8 +10,9 @@
 #define _SHA1_HPP_
 
 #include <stdint.h>
+#include "export.h"
 
-class SHA1
+class DLL_EXPORT SHA1
 {
 public:
 	SHA1();

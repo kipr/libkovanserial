@@ -15,7 +15,7 @@
 #include <netinet/in.h>
 #endif
 
-struct Advert
+struct DLL_EXPORT Advert
 {
 	Advert();
 	Advert(const char *serial, const char *version,
@@ -27,7 +27,7 @@ struct Advert
 	char name[32];
 };
 
-struct IncomingAdvert
+struct DLL_EXPORT IncomingAdvert
 {
 	Advert ad;
 	sockaddr_in sender;

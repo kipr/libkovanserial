@@ -2,10 +2,11 @@
 #define _XOR_HPP_
 
 #include <stdint.h>
+#include "export.h"
 
 namespace xor_crypt
 {
-	bool crypt(const uint8_t *const data, uint8_t *const output, const uint64_t size,
+	DLL_EXPORT bool crypt(const uint8_t *const data, uint8_t *const output, const uint64_t size,
 		const uint8_t *const key, const uint64_t keySize);
 
 	template<typename T>
