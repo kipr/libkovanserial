@@ -1,7 +1,7 @@
 #include "kovanserial/tcp_server.hpp"
 
 #include "kovanserial/general.hpp"
-#include "socket_utils.hpp"
+#include "kovanserial/socket_utils.hpp"
 
 #ifdef WIN32
 #define _WIN32_WINNT 0x0501

@@ -1,6 +1,6 @@
 #include "kovanserial/tcp.hpp"
 
-#include "socket_utils.hpp"
+#include "kovanserial/socket_utils.hpp"
 
 #ifdef WIN32
 #include <winsock2.h>
