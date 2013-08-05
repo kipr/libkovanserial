@@ -34,7 +34,7 @@
 
 #include <string>
 #include <iostream>
-
+#include "export.h"
 
 // a small class for calculating MD5 hashes of strings or byte arrays
 // it is not meant to be fast or secure
@@ -46,7 +46,7 @@
 //      MD5(std::string).hexdigest()
 //
 // assumes that char is 8 bit and int is 32 bit
-class MD5
+class DLL_EXPORT MD5
 {
 public:
 	typedef unsigned char uint1; //  8bit

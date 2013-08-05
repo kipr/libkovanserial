@@ -1,7 +1,9 @@
 #ifndef _GENERAL_HPP_
 #define _GENERAL_HPP_
 
-long msystime();
-void yield();
+#include "export.h"
+
+DLL_EXPORT long msystime();
+DLL_EXPORT void yield();
 
 #endif

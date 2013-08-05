@@ -2,6 +2,7 @@
 #define _COMMAND_TYPES_HPP_
 
 #include <stdint.h>
+#include "export.h"
 
 #define COMMAND_ACTION_RUN ("run")
 #define COMMAND_ACTION_COMPILE ("compile")
@@ -43,60 +44,60 @@ namespace Command
 		ProtocolVersion
 	};
 	
-	struct PropertyData
+	struct DLL_EXPORT PropertyData
 	{
 		char name[8];
 	};
 	
-	struct PropertyValuePairData
+	struct DLL_EXPORT PropertyValuePairData
 	{
 		char name[8];
 		char value[128];
 	};
 	
-	struct PropertyListData
+	struct DLL_EXPORT PropertyListData
 	{
 		size_t size;
 		PropertyData names[50];
 	};
 	
-	struct FileHeaderData
+	struct DLL_EXPORT FileHeaderData
 	{
 		uint32_t size;
 		char metadata[200];
 		char dest[256];
 	};
 	
-	struct FileActionData
+	struct DLL_EXPORT FileActionData
 	{
 		char action[8];
 		char dest[500];
 	};
 	
-	struct FileActionProgressData
+	struct DLL_EXPORT FileActionProgressData
 	{
 		bool finished;
 		double progress;
 	};
 	
-	struct AuthenticationInfoData
+	struct DLL_EXPORT AuthenticationInfoData
 	{
 		bool authNecessary;
 	};
 	
-	struct RequestAuthenticationData
+	struct DLL_EXPORT RequestAuthenticationData
 	{
 		// MD5 hash
 		uint8_t password[16];
 	};
 	
-	struct ConfirmAuthenticationData
+	struct DLL_EXPORT ConfirmAuthenticationData
 	{
 		bool success;
 		uint8_t scrambledSessionKey[KOVAN_SERIAL_SESSION_KEY_SIZE];
 	};
 	
-	struct ProtocolVersionData
+	struct DLL_EXPORT ProtocolVersionData
 	{
 		char version[65];
 	};

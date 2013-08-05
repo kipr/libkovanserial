@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <string.h>
 
-struct Packet
+struct DLL_EXPORT Packet
 {
 	Packet();
 	Packet(const uint16_t &type);
