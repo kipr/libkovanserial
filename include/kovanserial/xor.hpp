@@ -2,7 +2,7 @@
 #define _XOR_HPP_
 
 #include <stdint.h>
-#include "export.h"
+#include "compat.hpp"
 
 namespace xor_crypt
 {

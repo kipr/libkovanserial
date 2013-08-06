@@ -2,7 +2,7 @@
 #define _COMMAND_TYPES_HPP_
 
 #include <stdint.h>
-#include "export.h"
+#include "compat.hpp"
 
 #define COMMAND_ACTION_RUN ("run")
 #define COMMAND_ACTION_COMPILE ("compile")

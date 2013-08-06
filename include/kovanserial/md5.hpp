@@ -34,7 +34,7 @@
 
 #include <string>
 #include <iostream>
-#include "export.h"
+#include "compat.hpp"
 
 // a small class for calculating MD5 hashes of strings or byte arrays
 // it is not meant to be fast or secure

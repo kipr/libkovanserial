@@ -2,7 +2,7 @@
 #define _RANDOMIZE_HPP_
 
 #include <stdint.h>
-#include "export.h"
+#include "compat.hpp"
 
 namespace randomize
 {

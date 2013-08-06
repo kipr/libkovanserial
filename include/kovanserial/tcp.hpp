@@ -2,7 +2,7 @@
 #define _TCP_HPP_
 
 #include "transmitter.hpp"
-#include "export.h"
+#include "compat.hpp"
 
 class DLL_EXPORT Tcp : public Transmitter
 {

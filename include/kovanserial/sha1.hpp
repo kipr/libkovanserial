@@ -10,7 +10,7 @@
 #define _SHA1_HPP_
 
 #include <stdint.h>
-#include "export.h"
+#include "compat.hpp"
 
 class DLL_EXPORT SHA1
 {

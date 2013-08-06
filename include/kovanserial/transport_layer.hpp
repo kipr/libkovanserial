@@ -5,7 +5,7 @@
 
 #include "crc.h"
 #include "transmitter.hpp"
-#include "export.h"
+#include "compat.hpp"
 
 #include <algorithm>
 #include <string.h>
