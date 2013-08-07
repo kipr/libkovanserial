@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "compat.hpp"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,7 +55,7 @@ crc_t crc_reflect(crc_t data, size_t data_len);
  *
  * \return     The initial crc value.
  *****************************************************************************/
-static inline crc_t crc_init(void)
+static D_INLINE crc_t crc_init(void)
 {
     return 0xffffffff;
 }
@@ -76,7 +78,7 @@ crc_t crc_update(crc_t crc, const uint8_t *data, size_t data_len);
  * \param crc  The current crc value.
  * \return     The final crc value.
  *****************************************************************************/
-static inline crc_t crc_finalize(crc_t crc)
+static D_INLINE crc_t crc_finalize(crc_t crc)
 {
     return crc ^ 0xffffffff;
 }
