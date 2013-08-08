@@ -19,7 +19,7 @@ elseif(WIN32)
 	list(REMOVE_ITEM SOURCES ${libkovanserial_SOURCE_DIR}/src/usb_serial_unix.cpp)
 endif()
 
-add_library(kovanserial SHARED ${SOURCES})
+add_library(kovanserial SHARED ${SOURCES} ${INCLUDES})
 
 if(WIN32)
 target_link_libraries(kovanserial ws2_32)
