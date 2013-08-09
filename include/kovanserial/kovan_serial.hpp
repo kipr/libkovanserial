@@ -8,7 +8,7 @@
 #include <kovanserial/transport_layer.hpp>
 #include <kovanserial/command_types.hpp>
 
-#include "compat.hpp"
+#include "kovan_serial_compat.hpp"
 
 #define KOVAN_SERIAL_PORT "8374"
 #define KOVAN_SERIAL_PROTOCOL_VERSION "2"

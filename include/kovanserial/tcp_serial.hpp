@@ -2,7 +2,7 @@
 #define _TCP_SERIAL_HPP_
 
 #include "tcp.hpp"
-#include "compat.hpp"
+#include "kovan_serial_compat.hpp"
 
 #ifdef WIN32
 #define _WIN32_WINNT 0x0501

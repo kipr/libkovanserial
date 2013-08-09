@@ -2,7 +2,7 @@
 #define _USB_SERIAL_WIN_HPP_
 
 #include "transmitter.hpp"
-#include "compat.hpp"
+#include "kovan_serial_compat.hpp"
 
 #include <stdint.h>
 #include <windows.h>

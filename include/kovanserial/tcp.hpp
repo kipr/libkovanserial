@@ -2,7 +2,7 @@
 #define _TCP_HPP_
 
 #include "transmitter.hpp"
-#include "compat.hpp"
+#include "kovan_serial_compat.hpp"
 
 class DLL_EXPORT Tcp : public Transmitter
 {

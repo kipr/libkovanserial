@@ -2,7 +2,7 @@
 #define _RANDOMIZE_HPP_
 
 #include <stdint.h>
-#include "compat.hpp"
+#include "kovan_serial_compat.hpp"
 
 namespace randomize
 {

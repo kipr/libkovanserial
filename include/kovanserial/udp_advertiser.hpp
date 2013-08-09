@@ -3,7 +3,7 @@
 
 #include <string>
 #include <list>
-#include "compat.hpp"
+#include "kovan_serial_compat.hpp"
 #ifdef WIN32
 #define _WIN32_WINNT 0x0501
 #include <winsock2.h>

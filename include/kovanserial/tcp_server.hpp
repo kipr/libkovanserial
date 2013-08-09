@@ -2,7 +2,7 @@
 #define _TCP_SERVER_HPP_
 
 #include "tcp.hpp"
-#include "compat.hpp"
+#include "kovan_serial_compat.hpp"
 
 class DLL_EXPORT TcpServer : public Tcp
 {

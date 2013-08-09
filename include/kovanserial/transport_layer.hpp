@@ -5,7 +5,7 @@
 
 #include "crc.h"
 #include "transmitter.hpp"
-#include "compat.hpp"
+#include "kovan_serial_compat.hpp"
 
 #include <algorithm>
 #include <string.h>
