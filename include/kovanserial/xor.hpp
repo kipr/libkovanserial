@@ -2,7 +2,7 @@
 #define _XOR_HPP_
 
 #include <stdint.h>
-#include "kovan_serial_compat.hpp"
+#include "compat.hpp"
 
 namespace xor_crypt
 {

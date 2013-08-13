@@ -10,7 +10,7 @@
 #define _SHA1_HPP_
 
 #include <stdint.h>
-#include "kovan_serial_compat.hpp"
+#include "compat.hpp"
 
 class DLL_EXPORT SHA1
 {

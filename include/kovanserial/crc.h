@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "kovan_serial_compat.hpp"
+#include "compat.hpp"
 
 #ifdef __cplusplus
 extern "C" {

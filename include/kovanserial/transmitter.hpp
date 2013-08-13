@@ -2,7 +2,7 @@
 #define _TRANSMITTER_HPP_
 
 #include "general.hpp"
-#include "kovan_serial_compat.hpp"
+#include "compat.hpp"
 #include <errno.h>
 #include <stdint.h>
 #include <sys/types.h>
