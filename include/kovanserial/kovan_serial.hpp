@@ -44,6 +44,8 @@ public:
 	bool listProperties(std::list<std::string> &names);
 	
 	bool sendFile(const std::string &dest, const std::string &metadata, std::istream *in);
+	bool sendFile(const std::string &dest, const std::string &metadata, const unsigned char *data,
+		const size_t size);
 	bool confirmFile(const bool &good);
 	bool recvFile(const size_t &size, std::ostream *out, const uint32_t &timeout = 0);
 	

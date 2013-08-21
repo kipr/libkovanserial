@@ -297,6 +297,51 @@ bool KovanSerial::sendFile(const std::string &dest, const std::string &metadata,
 	return true;
 }
 
+bool KovanSerial::sendFile(const std::string &dest, const std::string &metadata, const unsigned char *data,
+		const size_t size)
+{
+		Command::FileHeaderData header;
+	strncpy(header.dest, dest.c_str(), 256);
+	strncpy(header.metadata, metadata.c_str(), 200);
+	header.size = size;
+	
+	std::cout << "Sending file header." << std::endl;
+	if(error(m_transport->send(Packet(Command::FileHeader, header)))) return false;
+	
+	std::cout << "Waiting on confirm..." << std::endl;
+	Packet confirm;
+	if(error(m_transport->recv(confirm, 15000)) || confirm.type != Command::FileConfirm) {
+		std::cout << "Didn't receive confirm. Aborting." << std::endl;
+		return false;
+	}
+	std::cout << "Got confirm packet." << std::endl;
+	
+	bool good = false;
+	confirm.as(good);
+	if(!good) {
+		std::cout << "Other side rejected our transfer." << std::endl;
+		return false;
+	}
+	std::cout << "Sening file..." << std::endl;
+	uint8_t buffer[TRANSPORT_MAX_DATA_SIZE];
+	size_t i = 0;
+	while(i < header.size) {
+		size_t cpy = std::min(size - i, TRANSPORT_MAX_DATA_SIZE);
+		memcpy(buffer, data + i, cpy);
+		i += cpy;
+		if(error(m_transport->send(Packet(Command::File,
+			buffer, TRANSPORT_MAX_DATA_SIZE)))) {
+			std::cout << "sending file packet failed" << std::endl;
+			return false;
+		}
+		std::cout << "Sent " << i << " of " << header.size << std::endl;
+	}
+	
+	std::cout << "Finished writing entire file" << std::endl;
+	
+	return true;
+}
+
 bool KovanSerial::confirmFile(const bool &good)
 {
 	return !error(m_transport->send(Packet(Command::FileConfirm, good)));
