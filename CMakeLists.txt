@@ -19,6 +19,10 @@ elseif(WIN32)
 	list(REMOVE_ITEM SOURCES ${libkovanserial_SOURCE_DIR}/src/usb_serial_unix.cpp)
 endif()
 
+if(APPLE)
+  # set(CMAKE_OSX_SYSROOT "${OSX_DEVELOPER_ROOT}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk")
+endif(APPLE)
+
 add_library(kovanserial SHARED ${SOURCES} ${INCLUDES})
 
 if(WIN32)

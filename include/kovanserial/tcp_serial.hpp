@@ -17,15 +17,15 @@
 class DLL_EXPORT TcpSerial : public Tcp
 {
 public:
-	TcpSerial(const char *host, const char *service);
+	TcpSerial(const char *host, const unsigned short port);
 	
 	virtual bool makeAvailable();
 	virtual void endSession();
 	virtual bool isReliable() const;
 
 private:
-	char m_host[128];
-	char m_service[128];
+	char _host[128];
+  unsigned short _port;
 };
 
 #endif

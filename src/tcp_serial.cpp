@@ -19,23 +19,22 @@
 #include <iostream>
 #include <stdio.h>
 
-TcpSerial::TcpSerial(const char *host, const char *service)
+TcpSerial::TcpSerial(const char *host, const unsigned short port)
+  : _port(port)
 {
-	strncpy(m_host, host, 128);
-	strncpy(m_service, service, 128);
+	strncpy(_host, host, 128);
 }
 
 bool TcpSerial::makeAvailable()
 {
 	closeFd();
 	setFd(socket(PF_INET, SOCK_STREAM, IPPROTO_TCP));
-	addrinfo hints;
-	addrinfo *res;
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	getaddrinfo(m_host, m_service, &hints, &res);
-	bool ret = ::connect(fd(), res->ai_addr, res->ai_addrlen);
+	sockaddr_in service;
+	service.sin_family = AF_INET;
+  hostent *const he = gethostbyname(_host);
+  memcpy(&service.sin_addr, he->h_addr_list[0], he->h_length);
+	service.sin_port = htons(_port);
+	bool ret = ::connect(fd(), reinterpret_cast<const sockaddr *>(&service), sizeof(service));
 #ifdef WIN32
 	u_long arg = 1;
 	if(ioctlsocket(fd(), FIONBIO, &arg) < 0) perror("set non-blocking");
@@ -48,7 +47,6 @@ bool TcpSerial::makeAvailable()
 #ifdef WIN32
 	std::cout << "makeAvail ret = " << ret << " " << WSAGetLastError() << std::endl;
 #endif
-	freeaddrinfo(res);
 	return ret == 0;
 }
 

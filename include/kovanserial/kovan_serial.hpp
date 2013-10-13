@@ -10,7 +10,7 @@
 
 #include "compat.hpp"
 
-#define KOVAN_SERIAL_PORT "8374"
+#define KOVAN_SERIAL_PORT 8374
 #define KOVAN_SERIAL_PROTOCOL_VERSION "2"
 
 class DLL_EXPORT KovanSerial

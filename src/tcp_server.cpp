@@ -38,31 +38,22 @@ TcpServer::~TcpServer()
 
 }
 
-bool TcpServer::bind(const char *port)
+bool TcpServer::bind(const unsigned short port)
 {
-	addrinfo hints;
-	addrinfo *res;
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
-	if(getaddrinfo(NULL, port, &hints, &res) != 0) return false;
-	
 	// TODO: This is a temporary windows hack. addrinfo problems?
 	sockaddr_in service;
 	service.sin_family = AF_INET;
 	service.sin_addr.s_addr = INADDR_ANY;
-	service.sin_port = htons(8374);
+	service.sin_port = htons(port);
 
 	int ret = 0;
-
 	
 #ifdef WIN32
 	ret = ::bind(m_ourFd, (sockaddr *)&service, sizeof(service));
 	std::cout << "bind returned " << ret << " on our fd of "
 		<< m_ourFd << " " << WSAGetLastError() << std::endl;
 #else
-	ret = ::bind(m_ourFd, res->ai_addr, res->ai_addrlen);
+	ret = ::bind(m_ourFd, reinterpret_cast<const sockaddr *>(&service), sizeof(service));
 #endif
 	
 #ifdef WIN32
@@ -75,7 +66,6 @@ bool TcpServer::bind(const char *port)
 	const int v = 1;
 	if(setsockopt(m_ourFd, SOL_SOCKET, SO_REUSEADDR, (const char *)&v, sizeof(v)) < 0) perror("reuseaddr");
 	
-	freeaddrinfo(res);
 	return ret == 0;
 }
 

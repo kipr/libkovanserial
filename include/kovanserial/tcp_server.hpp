@@ -10,7 +10,7 @@ public:
 	TcpServer();
 	~TcpServer();
 	
-	bool bind(const char *port);
+	bool bind(const unsigned short port);
 	bool listen(const int &backLog);
 	bool accept(uint64_t timeout);
 	
