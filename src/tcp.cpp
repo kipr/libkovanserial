@@ -3,6 +3,7 @@
 #include "kovanserial/socket_utils.hpp"
 
 #ifdef WIN32
+#define NOMINMAX
 #include <winsock2.h>
 #include <windows.h>
 #else

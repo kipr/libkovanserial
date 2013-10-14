@@ -5,6 +5,7 @@
 #include "compat.hpp"
 
 #include <stdint.h>
+#define NOMINMAX
 #include <windows.h>
 
 class DLL_EXPORT UsbSerialWin : public Transmitter

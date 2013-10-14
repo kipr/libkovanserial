@@ -1,6 +1,7 @@
 #include "kovanserial/general.hpp"
 
 #ifdef WIN32
+#define NOMINMAX
 #include <time.h>
 #include <windows.h>
 #else
