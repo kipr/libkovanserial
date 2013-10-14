@@ -19,12 +19,13 @@ struct DLL_EXPORT Advert
 {
 	Advert();
 	Advert(const char *serial, const char *version,
-		const char *device, const char *name);
+		const char *device, const char *name, const unsigned short port);
 	
 	char serial[32];
 	char version[32];
 	char device[32];
 	char name[32];
+  unsigned short port;
 };
 
 struct DLL_EXPORT IncomingAdvert

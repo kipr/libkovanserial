@@ -27,6 +27,7 @@
 #define AD_GROUP "225.0.0.37"
 
 Advert::Advert()
+  : port(0)
 {
 	memset(serial, 0, 32);
 	memset(version, 0, 32);
@@ -35,7 +36,8 @@ Advert::Advert()
 }
 
 Advert::Advert(const char *serial, const char *version,
-	const char *device, const char *name)
+  const char *device, const char *name, const unsigned short p)
+  : port(p)
 {
 	strncpy(this->serial, serial, 32);
 	strncpy(this->version, version, 32);

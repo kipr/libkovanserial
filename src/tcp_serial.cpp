@@ -34,6 +34,7 @@ bool TcpSerial::makeAvailable()
   hostent *const he = gethostbyname(_host);
   memcpy(&service.sin_addr, he->h_addr_list[0], he->h_length);
 	service.sin_port = htons(_port);
+  std::cout << "makeAvail(" << _host << ", " << _port << ")" << std::endl;
 	bool ret = ::connect(fd(), reinterpret_cast<const sockaddr *>(&service), sizeof(service));
 #ifdef WIN32
 	u_long arg = 1;
