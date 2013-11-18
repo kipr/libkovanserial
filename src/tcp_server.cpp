@@ -85,14 +85,17 @@ bool TcpServer::accept(uint64_t timeout)
 	int fd = -1;
 	do {
 		fd = ::accept(m_ourFd, (sockaddr *)&addr, &size);
-		if(m_restriction == OnlyLocal) {
+		if(m_restriction == OnlyLocal && fd >= 0) {
 			sockaddr_in6 peer;
 			socklen_t len = sizeof(peer);
 			getpeername(fd, (sockaddr *)&peer, &len);
 			sockaddr_in6 localhost;
 			memset(localhost.sin6_addr.s6_addr, 0, 16);
 			localhost.sin6_addr.s6_addr[15] = 1;
-			if(!memcmp(peer.sin6_addr.s6_addr, localhost.sin6_addr.s6_addr, 16)) return false;
+      if(!memcmp(peer.sin6_addr.s6_addr, localhost.sin6_addr.s6_addr, 16)) {
+        close(fd);
+        continue;
+      }
 		}
 		
 		// std::cout << "accept = " << WSAGetLastError() << std::endl;

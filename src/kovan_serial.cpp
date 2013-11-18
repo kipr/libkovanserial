@@ -429,7 +429,7 @@ bool KovanSerial::recvFileActionProgress(bool &finished, double &progress, const
 	return true;
 }
 
-TransportLayer::Return  KovanSerial::next(Packet &p, const uint32_t &timeout)
+TransportLayer::Return KovanSerial::next(Packet &p, const uint32_t &timeout)
 {
 	return m_transport->recv(p, timeout);
 }
