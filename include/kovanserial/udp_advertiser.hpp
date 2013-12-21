@@ -27,12 +27,16 @@ struct DLL_EXPORT Advert
 	char device[32];
 	char name[32];
   unsigned short port;
+  
+  bool operator ==(const Advert &rhs) const;
 };
 
 struct DLL_EXPORT IncomingAdvert
 {
 	Advert ad;
 	sockaddr_in sender;
+  
+  bool operator ==(const IncomingAdvert &rhs) const;
 };
 
 class DLL_EXPORT UdpAdvertiser

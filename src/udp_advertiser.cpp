@@ -46,6 +46,21 @@ Advert::Advert(const char *serial, const char *version,
 	strncpy(this->name, name, 32);
 }
 
+bool Advert::operator ==(const Advert &rhs) const
+{
+  if(memcmp(serial, rhs.serial, 32)) return false;
+  if(memcmp(version, rhs.version, 32)) return false;
+  if(memcmp(device, rhs.device, 32)) return false;
+  if(memcmp(name, rhs.name, 32)) return false;
+  return true;
+}
+
+bool IncomingAdvert::operator ==(const IncomingAdvert &rhs) const
+{
+  return ad == rhs.ad && sender.sin_addr.s_addr == rhs.sender.sin_addr.s_addr
+    && sender.sin_port == rhs.sender.sin_port;
+}
+
 UdpAdvertiser::UdpAdvertiser(bool onlyPulse)
 	: m_onlyPulse(onlyPulse),
 	m_fd(-1)
