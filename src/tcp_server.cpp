@@ -93,7 +93,11 @@ bool TcpServer::accept(uint64_t timeout)
 			memset(localhost.sin6_addr.s6_addr, 0, 16);
 			localhost.sin6_addr.s6_addr[15] = 1;
       if(!memcmp(peer.sin6_addr.s6_addr, localhost.sin6_addr.s6_addr, 16)) {
+#ifdef WIN32
+		closesocket(fd);
+#else
         close(fd);
+#endif
         continue;
       }
 		}
