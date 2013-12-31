@@ -91,35 +91,35 @@ void ChecksummedPacket::decrypt(const uint8_t *const key, const uint64_t keySize
 
 crc_t ChecksummedPacket::computeChecksum() const
 {
-	crc_t c = crc_init();
-	c = crc_update(c, reinterpret_cast<const uint8_t *>(&packet), sizeof(Packet));
-	c = crc_update(c, reinterpret_cast<const uint8_t *>(&order), sizeof(uint64_t));
-	c = crc_finalize(c);
-	return c;
+  crc_t c = crc_init();
+  c = crc_update(c, reinterpret_cast<const uint8_t *>(&packet), sizeof(Packet));
+  c = crc_update(c, reinterpret_cast<const uint8_t *>(&order), sizeof(uint64_t));
+  c = crc_finalize(c);
+  return c;
 }
 
 struct Ack
 {
-	Ack();
-	Ack(const bool &resend);
-	
-	bool resend : 1;
-	bool rejected : 1;
+  Ack();
+  Ack(const bool &resend);
+  
+  bool resend : 1;
+  bool rejected : 1;
 };
 
 Ack::Ack()
-	: resend(false)
+  : resend(false)
 {}
 
 Ack::Ack(const bool &resend)
-	: resend(resend)
+  : resend(resend)
 {
 }
 
 TransportLayer::TransportLayer(Transmitter *transmitter)
-	: m_transmitter(transmitter),
-	m_key(0),
-	m_keySize(0)
+  : m_transmitter(transmitter),
+  m_key(0),
+  m_keySize(0)
 {
 }
 
@@ -129,13 +129,13 @@ TransportLayer::~TransportLayer()
 
 void TransportLayer::setKey(const uint8_t *key, const uint64_t size)
 {
-	delete[] m_key;
-	m_key = 0;
-	m_keySize = 0;
-	if(!key || size < 1) return;
-	m_keySize = size;
-	m_key = new uint8_t[size];
-	memcpy(m_key, key, size);
+  delete[] m_key;
+  m_key = 0;
+  m_keySize = 0;
+  if(!key || size < 1) return;
+  m_keySize = size;
+  m_key = new uint8_t[size];
+  memcpy(m_key, key, size);
 }
 
 const uint8_t *TransportLayer::key() const
@@ -154,11 +154,6 @@ TransportLayer::Return TransportLayer::send(const Packet &p, const bool forceUnt
 	tmp.update(reinterpret_cast<const uint8_t *>(&p), sizeof(p));
 	tmp.finalize();
 	
-	std::cout << "Sent packet MD5: ";
-	for(unsigned i = 0; i < 16; ++i) {
-		std::cout << std::hex << (uint16_t)tmp.digest()[i];
-	}
-	std::cout << std::endl;
 	
 	// If we have a key, encrypt the packet
 	ChecksummedPacket ckp = m_key && !forceUntrusted
@@ -206,7 +201,7 @@ TransportLayer::Return TransportLayer::recv(Packet &p, const uint32_t &timeout)
 	bool encrypted = false;
 	do {
 		Transmitter::Return ret = m_transmitter->read(ckp, timeout);
-		std::cout << ret << std::endl;
+    
 		if(ret != Transmitter::Success) {
 			std::cout << "Reading ckp failed." << std::endl;
 			return fromTransmitterReturn(ret);
@@ -225,15 +220,9 @@ TransportLayer::Return TransportLayer::recv(Packet &p, const uint32_t &timeout)
 		MD5 tmp;
 		tmp.update(reinterpret_cast<const uint8_t *>(&p), sizeof(p));
 		tmp.finalize();
-	
-		std::cout << "Recved packet MD5: ";
-		for(unsigned i = 0; i < 16; ++i) {
-			std::cout << std::hex << (uint16_t)tmp.digest()[i];
-		}
-		std::cout << std::endl;
 		
 		if(m_transmitter->isReliable()) {
-			std::cout << "Packet delivered. Encrypted? " << encrypted << std::endl;
+			// std::cout << "Packet delivered. Encrypted? " << encrypted << std::endl;
 			return encrypted
 				? TransportLayer::Success
 				: TransportLayer::UntrustedSuccess;

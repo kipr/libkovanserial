@@ -7,6 +7,9 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+#warning "Remove me"
+#include <iostream>
+
 #ifdef _MSC_VER
 #include <basetsd.h>
 typedef SSIZE_T ssize_t;
@@ -33,10 +36,20 @@ public:
 	template<typename T>
 	inline Transmitter::Return read(T &t, const uint32_t timeout = 0)
 	{
-		if(!available()) return Transmitter::Error;
+		if(!available()) {
+      std::cout << "!available" << std::endl;
+      return Transmitter::Error;
+    }
 		ssize_t ret = readBlock(reinterpret_cast<uint8_t *>(&t), sizeof(T), timeout);
-		if(ret < 0) return Transmitter::Error;
-		if(ret != sizeof(T)) return Transmitter::Timeout;
+		if(ret < 0) {
+      std::cout << "readBlock error" << std::endl;
+      perror("readBlock");
+      return Transmitter::Error;
+    }
+		if(ret != sizeof(T)) {
+      std::cout << "Timeout" << std::endl;
+      return Transmitter::Timeout;
+    }
 		return Transmitter::Success;
 	}
 	
