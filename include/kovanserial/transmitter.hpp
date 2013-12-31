@@ -5,6 +5,7 @@
 #include "compat.hpp"
 #include <errno.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <sys/types.h>
 
 #warning "Remove me"
