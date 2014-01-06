@@ -29,6 +29,7 @@ bool KovanSerial::knockKnock(uint32_t timeout)
 	Packet p;
 	bool ret = !error(m_transport->recv(p, timeout)) && p.type == Command::WhosThere;
   std::cout << "<<<" << __PRETTY_FUNCTION__ << std::endl;
+  return ret;
 }
 
 bool KovanSerial::whosThere()
