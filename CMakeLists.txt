@@ -25,13 +25,13 @@ endif(APPLE)
 
 add_library(kovanserial SHARED ${SOURCES} ${INCLUDES})
 
+if(WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/../prefix)
+endif()
+
 if(WIN32)
 target_link_libraries(kovanserial ws2_32)
-install(FILES ${INCLUDES} DESTINATION ${CMAKE_SOURCE_DIR}/../prefix/include/kovanserial)
-install(TARGETS kovanserial
-	ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/../prefix/lib
-	RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/../prefix/lib)
-else()
-install(FILES ${INCLUDES} DESTINATION include/kovanserial)
-install(TARGETS kovanserial LIBRARY DESTINATION lib)
 endif()
+
+install(FILES ${INCLUDES} DESTINATION include/kovanserial)
+install(TARGETS kovanserial DESTINATION lib)
