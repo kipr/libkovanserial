@@ -8,9 +8,6 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#warning "Remove me"
-#include <iostream>
-
 #ifdef _MSC_VER
 #include <basetsd.h>
 typedef SSIZE_T ssize_t;
