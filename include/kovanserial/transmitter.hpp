@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <iostream>
 #include <sys/types.h>
 
 #ifdef _MSC_VER
